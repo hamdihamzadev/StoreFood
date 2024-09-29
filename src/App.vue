@@ -1,32 +1,61 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+    <div v-show="hideHeaderFooter" ><HeaderComp/></div>
+    <div v-show="hideHeaderFooter" class="mb-5" ><SearchSideCollections/></div>
+    <div class="content" ><router-view/></div>
+    <div v-show="hideHeaderFooter" class="mt-5"><FooterStore/></div>
   </div>
+
 </template>
+
+<script>
+import HeaderComp from "./components/HeaderComp.vue"
+import FooterStore from "./components/FooterComp.vue"
+import SearchSideCollections from './components/SearchSideCollections.vue'
+export default{
+  components:{
+    HeaderComp,
+    FooterStore,
+    SearchSideCollections
+  },
+
+  data(){
+    return{
+      hideHeaderFooter:true,
+    }
+  },
+
+ async mounted(){
+    this.hideHeaderFooter = this.$route.path !== '/Signup' && this.$route.path !== '/Login';
+    
+  }
+  
+}
+</script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; // Assure que #app prend toute la hauteur de l'écran
 
-nav {
-  padding: 30px;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+  .content {
+    flex: 1; // Assure que le contenu principal occupe l'espace restant
+  }
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  a{
+    text-decoration: none;
+    color: inherit;
+  }
+
+  p{
+    margin: 0px;
+  }
+
+  .fs-14{
+    font-size: 14px;
   }
 }
+
 </style>
