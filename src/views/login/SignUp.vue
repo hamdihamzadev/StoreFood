@@ -8,11 +8,11 @@
                     <p class="mb-5 text-body-secondary" >Once registered, you will have access to all our features .</p>
                     <b-form>
                         <b-row class="g-4" >
-                            <b-col>
+                            <b-col cols="12" lg="6" >
                                 <label for="text-password">Full Name</label>
                                 <b-form-input  class="h-input" type="text" id="text-password" aria-describedby="password-help-block"></b-form-input>
                             </b-col>
-                            <b-col>
+                            <b-col cols="12" lg="6">
                                 <label for="text-password">Phone</label>
                                 <b-form-input class="h-input" type="number" id="text-password" aria-describedby="password-help-block"></b-form-input>
                             </b-col>
@@ -32,7 +32,7 @@
                     </b-form>
                 </b-col>
                 <!-- img -->
-                <b-col  >
+                <b-col class="d-none d-lg-block" >
                     <div id="img" class="rounded" >
                     </div>
                 </b-col>
@@ -64,7 +64,7 @@
 }
 
 #img {
-    background-image: url('@/assets/img/loginimg.jpg');
+    background-image: url('@/assets/img/login.png');
     background-position-x: center;
     background-size: cover; /* Pour couvrir toute la div */
     height: 100%; /* Ajuste la hauteur selon ton besoin */

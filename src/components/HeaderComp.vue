@@ -23,7 +23,7 @@
                                 <b-icon icon="facebook" aria-hidden="true"></b-icon>
                             </div>
                             <div class="ps-2 border-start">
-                                <router-link tag="a" to="/Signup">
+                                <router-link tag="a" to="/Login">
                                     <b-icon class="me-2" icon="person-fill" aria-hidden="true"></b-icon>Login
                                 </router-link>
                             </div>
@@ -209,7 +209,9 @@
                 const index = this.links.findIndex(ele => ele.path === this.$route.path)
                 this.activeIndex = index
 
-            }
+            },
+
+          
         },
 
         mounted() {
