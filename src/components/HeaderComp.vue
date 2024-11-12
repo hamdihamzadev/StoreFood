@@ -8,7 +8,7 @@
                         <div class="d-flex gap-3">
                             <p class="fs-14">
                                 <b-icon class="me-1" icon="envelope-fill" aria-hidden="true"></b-icon>
-                                <span>hamdihamza@gmail.com</span>
+                                <span>teste@gmail.com</span>
                             </p>
                             <p class="fs-14 border-start ps-3">
                                 <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99</p>

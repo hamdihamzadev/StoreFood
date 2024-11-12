@@ -9,7 +9,7 @@
                         </p>
                         <img class="mb-3 w-100" :src="produit.img" alt="">
                         <b-card-text class="mt-2">
-                            <router-link tag="a" to="/">
+                            <router-link tag="a" :to="{ name: 'product', params: { slug: '/legume' }, query: { id: 'fsdf78588sd7fds8' } }">
                                 <p class=" mb-1">{{produit.nom}}</p>
                             </router-link>
                             <div class="mb-3">

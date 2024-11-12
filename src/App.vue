@@ -20,6 +20,7 @@
   import HeaderComp from "./components/HeaderComp.vue"
   import FooterStore from "./components/FooterComp.vue"
   import SearchSideCollections from './components/SearchSideCollections.vue'
+  import axios from "axios";
   export default {
     components: {
       HeaderComp,
@@ -38,9 +39,30 @@
       },
 
     },
+
+    methods:{
+      async login() {
+        const formLogin={email:'useradmin@gmail.com',password:'hahamalaha'}
+        try {
+          if (this.formLogin.email !== '' || this.formLogin.password !== '') {
+            const response = await axios.post(`${this.apiUrl}/api/admin/login`,formLogin)
+            const token = response.data.token
+            if (token) {
+              localStorage.setItem('tokenAdmin',token)
+            }
+          }
+
+        } catch (error) {
+          error.response.data.message === 'email is incorrecte' ? this.errorEmail.show = true : this.errorEmail.show=false
+          error.response.data.message === 'passwrod is incorrecte' ? this.errorPassword.show = true : this.errorPassword.show=false
+          error?console.log(error):null
+        }
+      },
+    },
+
+
     mounted() {
       this.hideHeaderFooter = this.$route.path !== '/Signup' && this.$route.path !== '/Login';
-
     },
 
     watch: {
