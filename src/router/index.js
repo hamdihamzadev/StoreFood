@@ -16,61 +16,61 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/:storeName',
     name: 'home',
     component: HomeView
   },
   {
-    path: '/All-blogs',
+    path: '/:storeName/All-blogs',
     name: 'blog',
     component: AllBlogs
   },
 
   {
-    path: '/PageProduct/:slug',
+    path: '/:storeName/PageProduct/:slug',
     name: 'product',
     component: PageProduct,
   },
 
   {
-    path: '/Categories',
+    path: '/:storeName/Categories',
     name: 'Categories',
     component: CategoryView,
   },
 
   {
-    path: '/Contact',
+    path: '/:storeName/Contact',
     name: 'Contact',
     component: ContactView,
   },
 
   {
-    path: '/Shopingcart',
+    path: '/:storeName/Shopingcart',
     name: 'shopingart',
     component: ShopingCart,
   },
 
   {
-    path: '/ChecKout',
+    path: '/:storeName/ChecKout',
     name: 'ChecKout',
     component: ChecKout,
   },
 
   {
-    path: '/BlogDetail',
+    path: '/:storeName/BlogDetail',
     name: 'BlogDetail',
     component:BlogDetail,
   },
 
   {
-    path: '/Signup',
+    path: '/:storeName/Signup',
     name: 'SignUp',
     component:SignUp,
     
   },
 
   {
-    path: '/Login',
+    path: '/:storeName/Login',
     name: 'Login',
     component:LoginView,
     
