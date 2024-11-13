@@ -11,7 +11,7 @@
                                 <span>teste@gmail.com</span>
                             </p>
                             <p class="fs-14 border-start ps-3">
-                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99</p>
+                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99 {{ nameStore }}</p>
                         </div>
                     </b-col>
                     <b-col>
@@ -50,7 +50,7 @@
                     <b-col lg="4" class="d-none d-lg-block">
                         <!-- hidden in sm and md -->
                         <nav class="d-flex justify-content-between ">
-                            <router-link v-for="(item,index) in links" :key="item.id" tag="li" :to="item.path">
+                            <router-link v-for="(item,index) in links" :key="item.id" tag="li" :to="`/${$route.params.storeName}${item.path}`">
                                 <a :id="item.id" @click="toggleActive(index)" class="small fw-bold"
                                     :class="{'ActiveLink':activeIndex===index}" href="">
                                     {{ item.text }} <b-icon v-if="item.children" icon="chevron-down" aria-hidden="true">
@@ -58,8 +58,11 @@
                                 </a>
 
                                 <b-popover  target="popover-pages" triggers="hover" placement="top">
-                                    <router-link v-for="child in item.children" :key="child.id" tag="li"
-                                        :to="child.path">
+                                    <router-link 
+                                       v-for="child in item.children" 
+                                       :key="child.id" 
+                                       tag="li"
+                                       :to="`/${$route.params.storeName}${child.path}`">
                                         <a id="links-pages" class="text-decoration-none d-block w-100 mb-2 " href="">{{ child.text }} </a>
                                     </router-link>
                                 </b-popover>
@@ -170,16 +173,16 @@
                         id: 'popover-pages',
                         children: [
                             {
-                                path: 'PageProduct',
+                                path: '/PageProduct',
                                 text: 'Page Product'
                             },
 
                             {
-                                path: 'Shopingcart',
+                                path: '/Shopingcart',
                                 text: 'Shoping Cart'
                             },
                             {
-                                path: 'ChecKout',
+                                path: '/ChecKout',
                                 text: 'ChecKout'
                             }
                         ]
