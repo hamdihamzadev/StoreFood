@@ -1,20 +1,20 @@
 <template>
     <section>
-        <b-container class="px-lg-5" >
-            <b-row class="gy-4 gy-lg-0" >
+        <b-container class="px-lg-5">
+            <b-row class="gy-4 gy-lg-0">
                 <b-col lg="3">
-                    <div id="sidebar-categories" class="position-relative" >
+                    <div id="sidebar-categories" class="position-relative">
                         <b-button v-b-toggle.collapse-1 variant="primary"
                             class="d-flex align-items-center justify-content-between gap-2 w-100 px-4 border-0  ">
                             <b-icon icon="list" aria-hidden="true"></b-icon>
                             <strong>All departements </strong>
                             <b-icon icon="chevron-down" aria-hidden="true"></b-icon>
                         </b-button>
-                        <b-collapse  id="collapse-1" class="mt-2 position-absolute z-3 w-100">
+                        <b-collapse id="collapse-1" class="mt-2 position-absolute z-3 w-100">
                             <b-card class="px-2">
                                 <nav class="d-flex flex-column gap-3 ">
                                     <router-link v-for="item in linkCategories" :key="item.id" :to="item.path" tag="li">
-                                        <a href="">{{ item.text }}</a>
+                                        <a href="">{{ item.name }}</a>
                                     </router-link>
                                 </nav>
                             </b-card>
@@ -49,44 +49,29 @@
 </template>
 
 <script>
+    import {
+        mapState,
+        mapActions
+    } from 'vuex';
     export default {
         name: 'SearchSideCollections',
-        data() {
-            return {
-                linkCategories: [{
-                        path: 'FreshMeat',
-                        text: "Fresh Meat"
-                    },
-                    {
-                        path: 'Vegetables',
-                        text: "Vegetables"
-                    },
-                    {
-                        path: 'Fruit&NutGifts',
-                        text: "Fruit & Nut Gifts"
-                    },
-                    {
-                        path: 'FreshBerries',
-                        text: "Fresh Berries"
-                    },
-                    {
-                        path: 'OceanFoods',
-                        text: "Ocean Foods"
-                    },
-                    {
-                        path: 'Butter&Eggs',
-                        text: "Butter & Eggs"
-                    },
-                    {
-                        path: 'Fastfood',
-                        text: "Fastfood"
-                    },
-                    {
-                        path: 'FreshOnion',
-                        text: "Fresh Onion"
-                    },
-                ]
-            }
+
+        computed: {
+            ...mapState('category', {
+                linkCategories: state => state.categories
+            }),
+
+        },
+
+        methods: {
+            ...mapActions("category", {
+                fetchCategories: 'ac_getCategories'
+            })
+        },
+
+        mounted(){
+            this.fetchCategories()
+            console.log(this.allcategories)
         }
     }
 </script>
@@ -101,22 +86,22 @@
     }
 
     #search {
-                    #form {
-                        input:focus {
-                            box-shadow: none;
-                            border-color: var(--paragraph-color)
-                        }
+        #form {
+            input:focus {
+                box-shadow: none;
+                border-color: var(--paragraph-color)
+            }
 
-                        #btn-search {
-                            background-color: var(--thirday-color);
-                        }
+            #btn-search {
+                background-color: var(--thirday-color);
+            }
 
-                    }
-                }
+        }
+    }
 
-                #icon-phone {
-                    background-color: var(--secondary-color);
-                    color: var(--thirday-color);
-                    font-size: xxx-large;
-                }
+    #icon-phone {
+        background-color: var(--secondary-color);
+        color: var(--thirday-color);
+        font-size: xxx-large;
+    }
 </style>

@@ -41,7 +41,7 @@
 
                     <b-col cols="6" lg="4">
                         <div class="text-start">
-                            <router-link to="/">
+                            <router-link :to="`/${$route.params.storeName}`">
                                 <img class="w-lg-25" src="../assets/img/logo.png" alt="">
                             </router-link>
                         </div>

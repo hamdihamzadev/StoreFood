@@ -21,6 +21,7 @@
   import FooterStore from "./components/FooterComp.vue"
   import SearchSideCollections from './components/SearchSideCollections.vue'
   import axios from "axios";
+
   export default {
     components: {
       HeaderComp,
@@ -38,9 +39,12 @@
         }
       },
 
+
+
     },
 
     methods:{
+
       async login() {
         const formLogin={email:'useradmin@gmail.com',password:'hahamalaha'}
         try {
@@ -58,11 +62,15 @@
           error?console.log(error):null
         }
       },
-    },
 
+   
+
+    },
 
     mounted() {
       this.hideHeaderFooter = this.$route.path !== '/Signup' && this.$route.path !== '/Login';
+    
+
     },
 
     watch: {
