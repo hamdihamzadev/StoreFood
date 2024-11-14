@@ -19,7 +19,7 @@
                                     <b-collapse visible id="collapse-2" class="mt-2 w-100">
                                         <b-card class="px-2">
                                             <nav class="d-flex flex-column gap-3 ">
-                                                <router-link v-for="(item,index) in productsCatgeories" :key="index"
+                                                <router-link v-for="(item,index) in linkCategories" :key="index"
                                                     :to="item.path" tag="li"> <a
                                                         @click="getPathCategory(item.id,item.name)"
                                                         href="">{{ item.name }}</a>
@@ -181,10 +181,11 @@
                     </b-sidebar>
                     <!-- side bar filter in phone and ipad end -->
 
-                    <b-row class="g-4" id="products" >
+                    <b-row class="g-4" id="products">
                         <b-col :cols="displayProducts" md="4" v-for="produit in produitsFiltres" :key="produit.id">
-                            <b-card class="position-relative" >
-                                <p v-if="produit.promotion.active" class="bg-danger p-2 position-absolute text-white" style="width: fit-content;" >{{ produit.promotion.percentage }}</p>
+                            <b-card class="position-relative">
+                                <p v-if="produit.promotion.active" class="bg-danger p-2 position-absolute text-white"
+                                    style="width: fit-content;">{{ produit.promotion.percentage }}</p>
                                 <img class="mb-3 w-100" :src="produit.img" alt="">
                                 <b-card-text class="mt-2">
                                     <router-link tag="a" to="/">
@@ -221,7 +222,7 @@
                     </b-row>
 
                     <!--  pagination -->
-                 
+
                 </b-col>
 
 
@@ -234,6 +235,10 @@
 </template>
 
 <script>
+    import {
+        mapState,
+        mapActions
+    } from 'vuex';
     export default {
         name: 'FilterProducts',
         data() {
@@ -251,7 +256,11 @@
                                 commandes: 120,
                                 enStock: true,
                                 img: require('@/assets/img/product/product-1.jpg'),
-                                promotion:{active:true,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: true,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -262,7 +271,11 @@
                                 commandes: 80,
                                 enStock: false,
                                 img: require('@/assets/img/product/product-2.jpg'),
-                                promotion:{active:false,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: false,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -273,7 +286,11 @@
                                 commandes: 200,
                                 enStock: true,
                                 img: require('@/assets/img/product/product-3.jpg'),
-                                promotion:{active:true,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: true,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -284,7 +301,11 @@
                                 commandes: 50,
                                 enStock: true,
                                 img: require('@/assets/img/product/product-9.jpg'),
-                                promotion:{active:false,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: false,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -295,7 +316,11 @@
                                 commandes: 80,
                                 enStock: false,
                                 img: require('@/assets/img/product/product-5.jpg'),
-                                promotion:{active:false,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: false,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -306,7 +331,11 @@
                                 commandes: 120,
                                 enStock: false,
                                 img: require('@/assets/img/product/product-6.jpg'),
-                                promotion:{active:true,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: true,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -317,7 +346,11 @@
                                 commandes: 150,
                                 enStock: false,
                                 img: require('@/assets/img/product/product-7.jpg'),
-                                promotion:{active:true,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: true,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                             {
@@ -328,57 +361,57 @@
                                 commandes: 150,
                                 enStock: false,
                                 img: require('@/assets/img/product/product-8.jpg'),
-                                promotion:{active:true,priceAfter:25,percentage:'20%'}
+                                promotion: {
+                                    active: true,
+                                    priceAfter: 25,
+                                    percentage: '20%'
+                                }
 
                             },
                         ],
                     },
-   
+
                 ],
+
+                // filter
                 gammePrice: [0, 200],
                 noteMinimale: 0,
                 trierParCommandes: false,
                 enStock: false,
                 CategorySelected: [],
                 namecategory: '',
-                linkCategories: [{
-                        path: 'FreshMeat',
-                        text: "Fresh Meat"
-                    },
-                    {
-                        path: 'Vegetables',
-                        text: "Vegetables"
-                    },
-                    {
-                        path: 'Fruit&NutGifts',
-                        text: "Fruit & Nut Gifts"
-                    },
-                    {
-                        path: 'FreshBerries',
-                        text: "Fresh Berries"
-                    },
-                    {
-                        path: 'OceanFoods',
-                        text: "Ocean Foods"
-                    },
-                    {
-                        path: 'Butter&Eggs',
-                        text: "Butter & Eggs"
-                    },
-                    {
-                        path: 'Fastfood',
-                        text: "Fastfood"
-                    },
-                    {
-                        path: 'FreshOnion',
-                        text: "Fresh Onion"
-                    },
-                ],
                 typeListingProducts: 'grid',
-   
-                
+
             }
         },
+
+        computed: {
+
+            ...mapState('category', {
+                linkCategories: state => state.categories
+            }),
+
+            produitsFiltres() {
+
+                return this.productsCatgeories[0].products
+                    .filter(produit =>
+                        produit.prix >= this.gammePrice[0] &&
+                        produit.prix <= this.gammePrice[1] &&
+                        produit.note >= this.noteMinimale &&
+                        (!this.enStock || produit.enStock)
+                    )
+                    .sort((a, b) => this.trierParCommandes ? b.commandes - a.commandes : 0)
+
+            },
+
+            displayProducts() {
+                const display = this.typeListingProducts === 'grid' ? 6 : 12
+                return display
+            }
+
+        },
+
+
         methods: {
             setNoteMinimale(note) {
                 this.noteMinimale = note === this.noteMinimale ? 0 : note
@@ -396,33 +429,20 @@
                 this.typeListingProducts = list
             },
 
+            ...mapActions("category", {
+                fetchCategories: 'ac_getCategories'
+            })
+
 
 
 
         },
-        computed: {
 
-            produitsFiltres() {
-
-                return this.productsCatgeories[0].products
-                    .filter(produit =>
-                        produit.prix >= this.gammePrice[0] &&
-                        produit.prix <= this.gammePrice[1] &&
-                        produit.note >= this.noteMinimale &&
-                        (!this.enStock || produit.enStock)
-                    )
-                    .sort((a, b) => this.trierParCommandes ? b.commandes - a.commandes : 0)
-                   
-            },
-
-            displayProducts() {
-                const display = this.typeListingProducts === 'grid' ? 6 : 12
-                return display
-            }
-
-
-
+        mounted() {
+            this.fetchCategories()
         }
+
+
     }
 </script>
 
@@ -461,7 +481,7 @@
         margin-top: 10px;
     }
 
-    .card{
+    .card {
         width: 100%;
     }
 
