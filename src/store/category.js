@@ -20,8 +20,9 @@ const actions={
             const namestore = window.location.pathname.split('/')[1]
             const response = await axios.get(`http://localhost:3000/api/categoryProduct/getCategoriesByCustomer/${namestore}`)
             let categories = response.data.categories.filter(ele=>ele.delete===false && ele.visibility===true).map(ele=>({
-                path:`${ele.name}-${ele._id}`,
-                name:ele.name
+                id:ele._id,
+                namecategory:ele.name,
+                img:ele.img
             }))
             commit('m_getCategories',categories)
 

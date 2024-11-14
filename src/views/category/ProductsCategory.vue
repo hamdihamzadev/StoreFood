@@ -1,7 +1,6 @@
 <template>
     <section id="filter-product" class="mt-5 ">
         <b-container class="px-lg-5">
-
             <b-row>
                 <!--  filter laptop start  -->
                 <b-col lg="3" class="mb-4 d-none d-lg-block ">
@@ -18,13 +17,18 @@
                                     </b-button>
                                     <b-collapse visible id="collapse-2" class="mt-2 w-100">
                                         <b-card class="px-2">
-                                            <nav class="d-flex flex-column gap-3 ">
-                                                <router-link v-for="(item,index) in linkCategories" :key="index"
-                                                    :to="item.path" tag="li"> <a
-                                                        @click="getPathCategory(item.id,item.name)"
-                                                        href="">{{ item.name }}</a>
-                                                </router-link>
-                                            </nav>
+
+                                            <router-link 
+                                                v-for="item in linkCategories" 
+                                                :key="item.id"
+                                                :to="`${$route.params.storeName}/Categories/${item.name}/${item.id}`" tag="li">
+                                                <a 
+                                                    href="" 
+                                                    class="mb-4">
+                                                    {{ item.name }}
+                                                </a>
+                                            </router-link>
+
                                         </b-card>
                                     </b-collapse>
                                 </div>
@@ -81,9 +85,8 @@
                     <b-row class="mb-4 ">
                         <b-col cols="6">
                             <h2 class="fw-bold">
-                                <strong id="namecategory" class="d-block"
-                                    v-if="namecategory!==''">{{ namecategory }}</strong>
-                                <strong id="namecategory" class="d-block" v-else>Fast Food</strong>
+                                <strong id="namecategory"
+                                    class="d-block">{{ $route.params.name.toUpperCase() }}</strong>
                             </h2>
                         </b-col>
                         <b-col cols="6" class="d-flex align-items-center justify-content-end">
@@ -373,6 +376,8 @@
 
                 ],
 
+                categorySelected: {},
+
                 // filter
                 gammePrice: [0, 200],
                 noteMinimale: 0,
@@ -413,6 +418,10 @@
 
 
         methods: {
+
+            getcategory(item) {
+                this.categorySelected = item
+            },
             setNoteMinimale(note) {
                 this.noteMinimale = note === this.noteMinimale ? 0 : note
             },
@@ -493,6 +502,10 @@
         background-color: var(--thirday-color)
     }
 
+    .cursor {
+        cursor: pointer;
+    }
+
     #prixMin,
     #prixMax {
         color: var(--thirday-color)
@@ -502,6 +515,7 @@
         height: max-content;
         background-color: var(--thirday-color);
     }
+
 
     @media (max-width: 768px) {
 

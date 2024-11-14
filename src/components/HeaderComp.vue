@@ -27,7 +27,6 @@
                                     <b-icon class="me-2" icon="person-fill" aria-hidden="true"></b-icon>Login
                                 </router-link>
                             </div>
-
                         </div>
                     </b-col>
                 </b-row>
@@ -201,6 +200,7 @@
         },
 
         methods: {
+
             toggleActive(index) {
                 setTimeout(() => {
                     this.activeIndex = index
@@ -208,13 +208,10 @@
             },
 
             toggleActiveMounted() {
-
                 const index = this.links.findIndex(ele => ele.path === this.$route.path)
                 this.activeIndex = index
-
             },
 
-          
         },
 
         mounted() {

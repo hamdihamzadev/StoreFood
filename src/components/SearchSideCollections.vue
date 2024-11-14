@@ -13,8 +13,12 @@
                         <b-collapse id="collapse-1" class="mt-2 position-absolute z-3 w-100">
                             <b-card class="px-2">
                                 <nav class="d-flex flex-column gap-3 ">
-                                    <router-link v-for="item in linkCategories" :key="item.id" :to="item.path" tag="li">
-                                        <a href="">{{ item.name }}</a>
+                                    <router-link 
+                                    v-for="item in linkCategories" 
+                                    :key="item.id" 
+                                    :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
+                                    tag="li">
+                                        <a href="">{{ item.namecategory }}</a>
                                     </router-link>
                                 </nav>
                             </b-card>

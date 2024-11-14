@@ -10,6 +10,7 @@ import ChecKout from '@/views/checkout/ChecKout.vue'
 import BlogDetail from '@/views/blogDetails/BlogDetails.vue'
 import SignUp from '@/views/login/SignUp.vue'
 import LoginView from '@/views/login/LoginView.vue'
+import ListCategories from '../views/category/ListCategories.vue'
 
 
 Vue.use(VueRouter)
@@ -33,9 +34,15 @@ const routes = [
   },
 
   {
-    path: '/:storeName/Categories',
+    path: '/:storeName/Categories/:namecategory/:id',
     name: 'Categories',
     component: CategoryView,
+  },
+
+  {
+    path: '/:storeName/Categories',
+    name: 'Categories',
+    component: ListCategories,
   },
 
   {
