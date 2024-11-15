@@ -14,10 +14,10 @@
                             <b-card class="px-2">
                                 <nav class="d-flex flex-column gap-3 ">
                                     <router-link 
-                                    v-for="item in linkCategories" 
-                                    :key="item.id" 
-                                    :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
-                                    tag="li">
+                                        v-for="item in linkCategories" 
+                                        :key="item.id" 
+                                        :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
+                                        tag="li">
                                         <a href="">{{ item.namecategory }}</a>
                                     </router-link>
                                 </nav>
@@ -41,7 +41,8 @@
                                 <b-icon id="icon-phone" icon="telephone-fill" scale="0.5" class="rounded-circle p-2"
                                     aria-hidden="true"></b-icon>
                                 <p class="d-flex flex-column"><strong>+65 11.188.888</strong> <span
-                                        class="fs-14">support 24/7 time</span> </p>
+                                    class="fs-14">support 24/7 time</span>
+                                 </p>
                             </div>
                         </b-col>
                     </b-row>

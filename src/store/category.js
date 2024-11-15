@@ -8,7 +8,7 @@ const state={
 const mutations={
     m_getCategories(state,categories) {
         state.categories = categories
-        console.log(state.categories)
+ 
     },
 }
 

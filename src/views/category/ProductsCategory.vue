@@ -21,11 +21,13 @@
                                             <router-link 
                                                 v-for="item in linkCategories" 
                                                 :key="item.id"
-                                                :to="`${$route.params.storeName}/Categories/${item.name}/${item.id}`" tag="li">
+                                                :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
+                                                tag="li">
                                                 <a 
                                                     href="" 
-                                                    class="mb-4">
-                                                    {{ item.name }}
+                                                    :class="{'fw-bold':item.id===$route.params.id}"
+                                                    class="d-block mb-2">
+                                                    {{ item.namecategory }}
                                                 </a>
                                             </router-link>
 
@@ -86,7 +88,7 @@
                         <b-col cols="6">
                             <h2 class="fw-bold">
                                 <strong id="namecategory"
-                                    class="d-block">{{ $route.params.name.toUpperCase() }}</strong>
+                                    class="d-block text-black">{{ $route.params.namecategory.toUpperCase() }}</strong>
                             </h2>
                         </b-col>
                         <b-col cols="6" class="d-flex align-items-center justify-content-end">

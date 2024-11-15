@@ -8,7 +8,7 @@
                     <div class="overflow-hidden border border-black">
                         <img id="img-category" class="img-fluid" :src="item.img" alt="">
                         <div id="content" class="p-3" >
-                            <h5 class="mb-3" ><strong>{{ item.namecategory }}</strong></h5>
+                            <h5 class="mb-2" ><strong>{{ item.namecategory }}</strong></h5>
                             <router-link 
                                 tag="small" 
                                 :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`">
@@ -64,6 +64,13 @@
     #content{
         background-color:black;
         color: white;
+
+        small{
+            cursor: pointer;
+            &:hover{
+                text-decoration:underline;
+            }
+        }
     }
 
 
