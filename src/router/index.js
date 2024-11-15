@@ -28,7 +28,7 @@ const routes = [
   },
 
   {
-    path: '/:storeName/PageProduct/:slug',
+    path: '/:storeName/:nameproduct/:id',
     name: 'product',
     component: PageProduct,
   },

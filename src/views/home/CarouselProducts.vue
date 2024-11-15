@@ -10,7 +10,7 @@
                         <router-link tag="li"
                             :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`">
                             <a href="" class="d-block">
-                                <strong>Fresh Onion</strong>
+                                <strong>{{ item.namecategory }}</strong>
                             </a>
                         </router-link>
                     </div>

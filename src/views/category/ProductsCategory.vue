@@ -18,14 +18,10 @@
                                     <b-collapse visible id="collapse-2" class="mt-2 w-100">
                                         <b-card class="px-2">
 
-                                            <router-link 
-                                                v-for="item in linkCategories" 
-                                                :key="item.id"
-                                                :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
+                                            <router-link v-for="item in linkCategories" :key="item.id"
+                                                :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`"
                                                 tag="li">
-                                                <a 
-                                                    href="" 
-                                                    :class="{'fw-bold':item.id===$route.params.id}"
+                                                <a href="" :class="{'fw-bold':item.id===$route.params.id}"
                                                     class="d-block mb-2">
                                                     {{ item.namecategory }}
                                                 </a>
@@ -92,9 +88,12 @@
                             </h2>
                         </b-col>
                         <b-col cols="6" class="d-flex align-items-center justify-content-end">
-                            <p class="text-secondary"><strong class="text-dark">
-                                    {{ produitsFiltres.length}}</strong>
-                                Products found</p>
+                            <p class="text-secondary">
+                                <strong class="text-dark">
+                                    {{ produitsFiltres.length}}
+                                </strong>
+                                Products found
+                            </p>
                         </b-col>
                         <b-col cols="6" class="d-flex align-items-center mt-4 ">
                             <b-button v-b-toggle.sidebarFilter
@@ -186,39 +185,60 @@
                     </b-sidebar>
                     <!-- side bar filter in phone and ipad end -->
 
+
+
                     <b-row class="g-4" id="products">
-                        <b-col :cols="displayProducts" md="4" v-for="produit in produitsFiltres" :key="produit.id">
+                        <b-col :cols="displayProducts" md="4" v-for="product in allProducts" :key="product.id">
                             <b-card class="position-relative">
-                                <p v-if="produit.promotion.active" class="bg-danger p-2 position-absolute text-white"
-                                    style="width: fit-content;">{{ produit.promotion.percentage }}</p>
-                                <img class="mb-3 w-100" :src="produit.img" alt="">
+                                <p 
+                                        v-if="product.promotion.priceAfter!==0" 
+                                        class="bg-danger p-2 position-absolute text-white"
+                                        style="width: fit-content;">
+                                        -{{ product.promotion.percentage }}%
+                                    </p> 
+                                <img class="mb-3 w-100" :src="product.imgs[0]" alt="">
                                 <b-card-text class="mt-2">
-                                    <router-link tag="a" to="/">
-                                        <p class=" mb-1">{{produit.nom}}</p>
+                                    <!-- NAME -->
+                                    <router-link 
+                                        tag="a" 
+                                        :to="`/${$route.params.storeName}/${product.name}/${product._id}`">
+                                        <p class=" mb-1">
+                                            <strong>{{product.name}}</strong>
+                                        </p>
                                     </router-link>
+
+                                   <!-- PRICE -->
                                     <div class="mb-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <p class="fs-5"><strong>{{ produit.prix.toFixed(2) }}€</strong></p>
-                                            <p class="text-danger">{{ produit.prix.toFixed(2) }}€</p>
+                                        <div  v-if="product.promotion.priceAfter!==0"  class="d-flex align-items-center gap-2">
+                                            <p class="fs-5 text-danger mb-0"><strong>{{ product.promotion.priceAfter  }}€</strong></p>
+                                            <p class="mb-0 text-decoration-line-through" >{{ product.price }}€</p>
                                         </div>
+                                        <div v-else class="d-flex align-items-center gap-2">
+                                            <p class="fs-5 mb-0"><strong>{{ product.price }}€</strong></p>
+                                        </div>
+
+                                        <!-- REVIEW -->
                                         <div>
                                             <b-icon v-for="etoile in 5" :key="etoile"
-                                                :icon="etoile <= produit.note ? 'star-fill' : 'star'"
-                                                :variant="etoile <= produit.note ? 'warning' : 'secondary'">
+                                                :icon="etoile <= product.reviews ? 'star-fill' : 'star'"
+                                                :variant="etoile <= product.reviews ? 'warning' : 'secondary'">
                                             </b-icon>
                                         </div>
                                     </div>
                                 </b-card-text>
 
+                              
                                 <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <!-- STOCK -->
                                     <p id="size-stock"
-                                        :class="['card-text', produit.enStock ? 'text-success' : 'text-danger']">
-                                        {{ produit.enStock ? 'In stock' : 'Out of stock' }}
-
-
+                                        :class="['card-text', product.quantity!==0 ? 'text-success' : 'text-danger']">
+                                        {{ product.quantity!==0 ? 'In stock' : 'Out of stock' }}
                                     </p>
-                                    <span id="size-order" class="ms-2 text-muted">({{ produit.commandes }}
-                                        Orders)</span>
+                                    <!-- ORDERS -->
+                                    <span id="size-order" class="ms-2 text-muted">
+                                        ({{ product.orders }} Orders)
+
+                                    </span>
                                 </div>
                             </b-card>
 
@@ -226,7 +246,7 @@
 
                     </b-row>
 
-                    <!--  pagination -->
+              
 
                 </b-col>
 
@@ -240,10 +260,12 @@
 </template>
 
 <script>
-    import {
+    import axios from 'axios';
+import {
         mapState,
         mapActions
     } from 'vuex';
+
     export default {
         name: 'FilterProducts',
         data() {
@@ -374,9 +396,12 @@
 
                             },
                         ],
+
+                        
                     },
 
                 ],
+                allProducts:[],
 
                 categorySelected: {},
 
@@ -396,6 +421,10 @@
 
             ...mapState('category', {
                 linkCategories: state => state.categories
+            }),
+
+            ...mapState('category', {
+                products: state => state.products
             }),
 
             produitsFiltres() {
@@ -440,17 +469,39 @@
                 this.typeListingProducts = list
             },
 
+            async getProductsCategory() {
+                try {
+                    const nameStore = this.$route.params.storeName
+                    const id = this.$route.params.id
+                    const response = await axios.get(`http://localhost:3000/api/product/productsCategory/${nameStore}/${id}`)
+                    this.allProducts = response.data.products
+
+                } catch (error) {
+                    console.log(`error get all categories is ${error}`)
+                }
+            },
+
             ...mapActions("category", {
                 fetchCategories: 'ac_getCategories'
-            })
-
-
-
+            }),
 
         },
 
+        watch: {
+            '$route.params.id': {
+                immediate: true,
+                handler() {
+                    this.getProductsCategory()
+                },
+            }
+        },
+
+
         mounted() {
             this.fetchCategories()
+            this.getProductsCategory()
+
+
         }
 
 

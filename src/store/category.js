@@ -2,14 +2,16 @@ import axios from "axios";
 // const apiUrl=process.env.VUE_APP_API_URL
 
 const state={
-    categories:[]
+    categories:[],
+
 }
 
 const mutations={
     m_getCategories(state,categories) {
         state.categories = categories
- 
     },
+
+
 }
 
 const actions={
@@ -30,6 +32,10 @@ const actions={
             console.log(`error get all categories is ${error}`)
         }
     },
+
+   
+
+
 }
 
 export default {

@@ -22,6 +22,7 @@
 
 <script>
     import ProductItem from "@/components/ProductItem.vue"
+
     export default {
         name: 'FeaturedProducts',
         components: {
@@ -314,6 +315,8 @@
                 return products
             }
         },
+
+        
 
       
     }
