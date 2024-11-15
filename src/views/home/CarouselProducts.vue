@@ -1,47 +1,24 @@
 <template>
     <section id="categories">
-        <b-container class="px-lg-5" >
-            <VueSlickCarousel v-bind="settings"  >
-                <div class="w-0 position-relative ">
-                    
-                    <img class=" w-100" :src="require('@/assets/img/categories/cat-1.jpg')" alt="">
+        <b-container class="px-lg-5">
+            <p>{{ linkCategories }}</p>
+            <VueSlickCarousel v-bind="settings">
+                <div v-for="item in listCategories" :key="item.id" class="w-0 position-relative ">
+
+                    <img id="img-category" class=" w-100 img-fluid" :src="item.img" alt="">
                     <div class="position-absolute start-50 bg-white text-center" id="name-category">
-                        <router-link tag="li" to="/" ><a href="" class="d-block"><strong>Fresh Onion</strong></a></router-link>
+                        <router-link tag="li"
+                            :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`">
+                            <a href="" class="d-block">
+                                <strong>Fresh Onion</strong>
+                            </a>
+                        </router-link>
                     </div>
-                
+
                 </div>
-                <div class="w-0 position-relative">
-                    
-                    <img class=" w-100" :src="require('@/assets/img/categories/cat-2.jpg')" alt="">
-                    <div class="position-absolute start-50 bg-white text-center" id="name-category">
-                        <router-link tag="li" to="/" ><a href="" class="d-block"><strong>Vegetables</strong></a></router-link>
-                    </div>
-                
-                </div>
-                <div class="w-0 position-relative">
-                    
-                    <img class=" w-100" :src="require('@/assets/img/categories/cat-3.jpg')" alt="">
-                    <div class="position-absolute start-50 bg-white text-center" id="name-category">
-                        <router-link tag="li" to="/" ><a href="" class="d-block"><strong>Ocean Foods</strong></a></router-link>
-                    </div>
-                
-                </div>
-                <div class="w-0 position-relative">
-                    
-                    <img class=" w-100" :src="require('@/assets/img/categories/cat-4.jpg')" alt="">
-                    <div class="position-absolute start-50 bg-white text-center" id="name-category">
-                        <router-link tag="li" to="/" ><a href="" class="d-block"><strong>Fresh Onion</strong></a></router-link>
-                    </div>
-                
-                </div>
-                <div class="w-0 position-relative">
-                    
-                    <img class=" w-100" :src="require('@/assets/img/categories/cat-5.jpg')" alt="">
-                    <div class="position-absolute start-50 bg-white text-center" id="name-category">
-                        <router-link tag="li" to="/" ><a href="" class="d-block"><strong>Oatmeal</strong></a></router-link>
-                    </div>
-                
-                </div>
+
+
+
 
             </VueSlickCarousel>
         </b-container>
@@ -50,6 +27,10 @@
 
 <script>
     import VueSlickCarousel from 'vue-slick-carousel'
+    import {
+        mapState,
+        mapActions
+    } from 'vuex';
 
     export default {
         name: 'SlickProducts',
@@ -92,47 +73,73 @@
                     ]
                 }
             }
+        },
+
+        computed: {
+            ...mapState('category', {
+                listCategories: state => state.categories
+            }),
+        },
+
+        methods: {
+            ...mapActions("category", {
+                fetchCategories: 'ac_getCategories'
+            })
+        },
+
+        mounted() {
+            this.fetchCategories()
         }
 
     };
 </script>
 
 <style scoped>
-::v-deep .slick-track{
-    display: flex !important;
-    gap: 20px !important;
-}
-::v-deep .slick-prev.slick-disabled:before, .slick-next.slick-disabled:before {
-    opacity: 8;
-    /* color: #000000; */
-}
-
-::v-deep .slick-next:before  {
-
-    color: #000000;
-}
-
-::v-deep .slick-prev:before  {
-
-    color: #000000;
-}
-.slick-initialized .slick-slide{
-    display: inline-block;
-    width: 0px;
-}
-
-#name-category{
-    bottom: 10%; 
-    transform: translateX(-50%);
-    width: 80%;;
-    padding-block: 7px;
-
-    a{
-    font-size: 18px;
-    color: #1c1c1c;
-    font-weight: 700;
-    text-transform: uppercase;
+    ::v-deep .slick-track {
+        display: flex !important;
+        gap: 20px !important;
     }
-}
 
+    ::v-deep .slick-prev.slick-disabled:before,
+    .slick-next.slick-disabled:before {
+        opacity: 8;
+        /* color: #000000; */
+    }
+
+    ::v-deep .slick-next:before {
+
+        color: #000000;
+    }
+
+    ::v-deep .slick-prev:before {
+
+        color: #000000;
+    }
+
+    .slick-initialized .slick-slide {
+        display: inline-block;
+        width: 0px;
+    }
+
+    #name-category {
+        bottom: 10%;
+        transform: translateX(-50%);
+        width: 80%;
+        ;
+        padding-block: 7px;
+
+        a {
+            font-size: 18px;
+            color: #1c1c1c;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    }
+
+    #img-category {
+        height: 270px;
+        width: 355px;
+        object-fit: fill;
+
+    }
 </style>

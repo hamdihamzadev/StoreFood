@@ -27,7 +27,7 @@ const actions={
             commit('m_getCategories',categories)
 
         } catch (error) {
-            console.log(`error get all orders is ${error}`)
+            console.log(`error get all categories is ${error}`)
         }
     },
 }
