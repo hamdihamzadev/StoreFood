@@ -185,7 +185,7 @@
                     </b-sidebar>
                     <!-- side bar filter in phone and ipad end -->
 
-
+<p>{{ produitsFiltres }}</p>
 
                     <b-row class="g-4" id="products">
                         <b-col :cols="displayProducts" md="4" v-for="product in allProducts" :key="product.id">
@@ -270,139 +270,7 @@ import {
         name: 'FilterProducts',
         data() {
             return {
-
-                productsCatgeories: [{
-                        name: 'freshMeat',
-                        path: '/Categories',
-                        id: 'freshMeat',
-                        products: [{
-                                id: 1,
-                                nom: "Produit 1",
-                                prix: 19.99,
-                                note: 4,
-                                commandes: 120,
-                                enStock: true,
-                                img: require('@/assets/img/product/product-1.jpg'),
-                                promotion: {
-                                    active: true,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 2,
-                                nom: "Produit 2",
-                                prix: 29.99,
-                                note: 3,
-                                commandes: 80,
-                                enStock: false,
-                                img: require('@/assets/img/product/product-2.jpg'),
-                                promotion: {
-                                    active: false,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 3,
-                                nom: "Produit 3",
-                                prix: 39.99,
-                                note: 5,
-                                commandes: 200,
-                                enStock: true,
-                                img: require('@/assets/img/product/product-3.jpg'),
-                                promotion: {
-                                    active: true,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 4,
-                                nom: "Produit 4",
-                                prix: 49.99,
-                                note: 2,
-                                commandes: 50,
-                                enStock: true,
-                                img: require('@/assets/img/product/product-9.jpg'),
-                                promotion: {
-                                    active: false,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 5,
-                                nom: "Produit 5",
-                                prix: 59.99,
-                                note: 4,
-                                commandes: 80,
-                                enStock: false,
-                                img: require('@/assets/img/product/product-5.jpg'),
-                                promotion: {
-                                    active: false,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 5,
-                                nom: "Produit 5",
-                                prix: 59.99,
-                                note: 4,
-                                commandes: 120,
-                                enStock: false,
-                                img: require('@/assets/img/product/product-6.jpg'),
-                                promotion: {
-                                    active: true,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 5,
-                                nom: "Produit 5",
-                                prix: 59.99,
-                                note: 4,
-                                commandes: 150,
-                                enStock: false,
-                                img: require('@/assets/img/product/product-7.jpg'),
-                                promotion: {
-                                    active: true,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                            {
-                                id: 5,
-                                nom: "Produit 5",
-                                prix: 59.99,
-                                note: 4,
-                                commandes: 150,
-                                enStock: false,
-                                img: require('@/assets/img/product/product-8.jpg'),
-                                promotion: {
-                                    active: true,
-                                    priceAfter: 25,
-                                    percentage: '20%'
-                                }
-
-                            },
-                        ],
-
-                        
-                    },
-
-                ],
                 allProducts:[],
-
                 categorySelected: {},
 
                 // filter
@@ -429,14 +297,14 @@ import {
 
             produitsFiltres() {
 
-                return this.productsCatgeories[0].products
-                    .filter(produit =>
-                        produit.prix >= this.gammePrice[0] &&
-                        produit.prix <= this.gammePrice[1] &&
-                        produit.note >= this.noteMinimale &&
-                        (!this.enStock || produit.enStock)
+                return this.allProducts
+                    .filter(product =>
+                        product.price >= this.gammePrice[0] &&
+                        product.price <= this.gammePrice[1] &&
+                        product.reviews >= this.noteMinimale &&
+                        (!this.enStock || product.quantity===0?false:true)
                     )
-                    .sort((a, b) => this.trierParCommandes ? b.commandes - a.commandes : 0)
+                    .sort((a, b) => this.trierParCommandes ? b.orders - a.orders : 0)
 
             },
 
