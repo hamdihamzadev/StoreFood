@@ -185,7 +185,6 @@
                     </b-sidebar>
                     <!-- side bar filter in phone and ipad end -->
 
-<p>{{ produitsFiltres }}</p>
 
                     <b-row class="g-4" id="products">
                         <b-col :cols="displayProducts" md="4" v-for="product in allProducts" :key="product.id">

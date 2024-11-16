@@ -29,31 +29,34 @@
                 <b-col lg="6" class="mt-5 mt-lg-0">
                     <div class="d-flex flex-column justify-content-around" style="height: 632px;">
                         <div>
-                            <h1 class="fw-bold mb-3"><strong>{{ product.name }}</strong></h1>
+                            <h1 class="fw-bold mb-3"><strong>{{ myProduct.name }}</strong></h1>
                             <p class="mb-3"><span class="text-danger">
                                     <b-form-rating v-model="Rating" inline no-border variant="warning"></b-form-rating>
                                     ({{ product.reviews.length }} Reviews)
                                 </span>
                             </p>
                             <!-- price start -->
-                            <p v-if="product.promotion.active">
-                                <strong class="fs-1">{{ product.promotion.priceAfter}}$</strong>
+                            <p v-if="myProduct.promotion.priceAfter">
+                                <strong class="fs-1">{{ myProduct.promotion.priceAfter}}$</strong>
                                 <span
-                                    class="ms-2 text-danger fs-4 text-decoration-line-through">{{ product.price }}$</span>
+                                    class="ms-2 text-danger fs-4 text-decoration-line-through">{{ myProduct.price }}$
+                                </span>
                             </p>
-                            <p v-else>{{ product.price }}$</p>
+                            <p v-else>{{ myProduct.price }}$</p>
                             <!-- price end -->
-                            <p class="mt-3" id="para-Product">{{ product.para }}</p>
+                            <p class="mt-3" id="para-Product">{{ myProduct.description }}</p>
 
                         </div>
                         <b-row>
                             <b-col lg="3" class="mb-3 mb-lg-0" style="height: 50px;">
                                 <b-form-spinbutton class="h-100" id="InputQuantity" v-model="ValueQuantity" min="1"
-                                    max="100"></b-form-spinbutton>
+                                    max="100">
+                                </b-form-spinbutton>
                             </b-col>
                             <b-col lg="9" style="height: 50px;">
-                                <b-button :disabled="product.availability===false" id="btn-addPrd" class="h-100 w-100">
-                                    <strong>ADD TO CART</strong></b-button>
+                                <b-button :disabled="myProduct.quantity===0" id="btn-addPrd" class="h-100 w-100">
+                                    <strong>ADD TO CART</strong>
+                                </b-button>
                             </b-col>
 
                         </b-row>
@@ -61,17 +64,13 @@
                         <div class="d-flex gap-5">
                             <div class="d-flex flex-column gap-2">
                                 <p> <strong>Availability</strong> </p>
-                                <p> <strong>Shipping</strong> </p>
-                                <p> <strong>Weight</strong> </p>
                                 <p> <strong>Share on</strong> </p>
                             </div>
                             <div class="d-flex flex-column gap-2">
                                 <p>
-                                    <span v-if="product.availability===true">In stock</span>
+                                    <span v-if="myProduct.quantity!==0">In stock</span>
                                     <span v-else>Out of stock</span>
                                 </p>
-                                <p>{{ product.shipping }}</p>
-                                <p>{{ product.weight }}</p>
                                 <div class="d-flex gap-3">
                                     <a href="">
                                         <b-icon icon="facebook" aria-hidden="true"></b-icon>
@@ -95,7 +94,7 @@
             <b-tabs id="tabs">
                 <b-tab title="Description" class="mt-5 px-2" active>
                     <p class="fs-5 mb-2"><strong>Description</strong></p>
-                    <b-card-text> {{product.description}}</b-card-text>
+                    <b-card-text> {{myProduct.description}}</b-card-text>
                 </b-tab>
                 <b-tab title="Information" class="mt-5 px-2">
                     <p class="fs-5 mb-2"><strong>Information</strong></p>
@@ -187,6 +186,7 @@
 <script>
     import breadCrumb from '@/components/BreadCrumb.vue';
     import VueSlickCarousel from 'vue-slick-carousel'
+    import axios from 'axios';
 
     export default {
         name: 'PageProduct',
@@ -267,6 +267,8 @@
                 imgSelected: require('@/assets/img/product/product-1.jpg'),
                 activeLike: false,
                 showBottom: false,
+
+                myProduct:{},
 
 
                 products: [{
@@ -404,10 +406,24 @@
                 this.showBottom = true
             },
 
+            async getProduct(){
+                try{
+                    const nameStore=this.$route.params.storeName
+                    const id=this.$route.params.id
+                    const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
+                    this.myProduct=response.data.product
+                 
+                }
+                catch(error){
+                    console.log('error get product in page product is :',error)
+                }
+            }
+
 
         },
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
+            this.getProduct()
         },
     };
 </script>
