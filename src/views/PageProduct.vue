@@ -21,7 +21,7 @@
                         </b-alert>
                     </div>
                     <VueSlickCarousel v-bind="settings">
-                        <div v-for="item in product.imgs" :key="item.id" class="bg-dark text-white">
+                        <div v-for="item in myProduct.imgs" :key="item.id" class="bg-dark text-white">
                             <b-img id="img-carousel" @click="getImg(item)" class="w-100" :src="item"></b-img>
                         </div>
                     </VueSlickCarousel>
@@ -412,6 +412,7 @@
                     const id=this.$route.params.id
                     const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
                     this.myProduct=response.data.product
+                    this.imgSelected=this.myProduct.imgs[0]
                  
                 }
                 catch(error){
