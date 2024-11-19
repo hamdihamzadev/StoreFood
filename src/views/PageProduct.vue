@@ -32,7 +32,7 @@
                             <h1 class="fw-bold mb-3"><strong>{{ myProduct.name }}</strong></h1>
                             <p class="mb-3"><span class="text-danger">
                                     <b-form-rating v-model="Rating" inline no-border variant="warning"></b-form-rating>
-                                    ({{ product.reviews.length }} Reviews)
+                                    ({{ myProduct.reviews.length }} Reviews)
                                 </span>
                             </p>
                             <!-- price start -->
@@ -42,7 +42,9 @@
                                     class="ms-2 text-danger fs-4 text-decoration-line-through">{{ myProduct.price }}$
                                 </span>
                             </p>
-                            <p v-else>{{ myProduct.price }}$</p>
+                            <p class="fs-1" v-else>
+                                <strong>{{ myProduct.price }}$</strong>
+                            </p>
                             <!-- price end -->
                             <p class="mt-3" id="para-Product">{{ myProduct.description }}</p>
 
@@ -138,46 +140,9 @@
             <!-- Related Product -->
             <div id="RelatedProduct " style="margin-top: 7rem;">
                 <h2 id="titleRelatedProduct" class="fw-bold text-center mb-5">Featured Product</h2>
-                <b-row class="g-4" id="products">
-                    <b-col cols="12" md="3" v-for="produit in products" :key="produit.id">
-                        <b-card class="position-relative">
-                            <p v-if="produit.promotion.active" class="bg-danger p-2 position-absolute text-white"
-                                style="width: fit-content;">{{ produit.promotion.percentage }}</p>
-                            <img class="mb-3 w-100" :src="produit.img" alt="">
-                            <b-card-text class="mt-2">
-                                <router-link tag="a" to="/">
-                                    <p class=" mb-1">{{produit.nom}}</p>
-                                </router-link>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <p class="fs-5"><strong>{{ produit.prix }}€</strong></p>
-                                        <p class="text-danger text-decoration-line-through">{{ produit.prix }}€</p>
-                                    </div>
-                                    <div>
-                                        <b-icon v-for="etoile in 5" :key="etoile"
-                                            :icon="etoile <= produit.note ? 'star-fill' : 'star'"
-                                            :variant="etoile <= produit.note ? 'warning' : 'secondary'">
-                                        </b-icon>
-                                    </div>
-                                </div>
-                            </b-card-text>
+                <ProductItem :products="FeaturedProduct" />
+            </div> 
 
-                            <div class="d-flex align-items-center justify-content-between gap-2">
-                                <p id="size-stock"
-                                    :class="['card-text', produit.enStock ? 'text-success' : 'text-danger']">
-                                    {{ produit.enStock ? 'In stock' : 'Out of stock' }}
-
-
-                                </p>
-                                <span id="size-order" class="ms-2 text-muted">({{ produit.commandes }}
-                                    Orders)</span>
-                            </div>
-                        </b-card>
-
-                    </b-col>
-
-                </b-row>
-            </div>
 
         </b-container>
     </section>
@@ -186,13 +151,15 @@
 <script>
     import breadCrumb from '@/components/BreadCrumb.vue';
     import VueSlickCarousel from 'vue-slick-carousel'
+    import ProductItem from '../components/ProductItem.vue'
     import axios from 'axios';
 
     export default {
         name: 'PageProduct',
         components: {
             breadCrumb,
-            VueSlickCarousel
+            VueSlickCarousel,
+            ProductItem
         },
         data() {
 
@@ -269,129 +236,8 @@
                 showBottom: false,
 
                 myProduct:{},
-
-
-                products: [{
-                        id: 1,
-                        nom: "Produit 1",
-                        prix: 19.99,
-                        note: 4,
-                        commandes: 120,
-                        enStock: true,
-                        img: require('@/assets/img/product/product-1.jpg'),
-                        promotion: {
-                            active: true,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 2,
-                        nom: "Produit 2",
-                        prix: 29.99,
-                        note: 3,
-                        commandes: 80,
-                        enStock: false,
-                        img: require('@/assets/img/product/product-2.jpg'),
-                        promotion: {
-                            active: false,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 3,
-                        nom: "Produit 3",
-                        prix: 39.99,
-                        note: 5,
-                        commandes: 200,
-                        enStock: true,
-                        img: require('@/assets/img/product/product-3.jpg'),
-                        promotion: {
-                            active: true,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 4,
-                        nom: "Produit 4",
-                        prix: 49.99,
-                        note: 2,
-                        commandes: 50,
-                        enStock: true,
-                        img: require('@/assets/img/product/product-9.jpg'),
-                        promotion: {
-                            active: false,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 5,
-                        nom: "Produit 5",
-                        prix: 59.99,
-                        note: 4,
-                        commandes: 80,
-                        enStock: false,
-                        img: require('@/assets/img/product/product-5.jpg'),
-                        promotion: {
-                            active: false,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 5,
-                        nom: "Produit 5",
-                        prix: 59.99,
-                        note: 4,
-                        commandes: 120,
-                        enStock: false,
-                        img: require('@/assets/img/product/product-6.jpg'),
-                        promotion: {
-                            active: true,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 5,
-                        nom: "Produit 5",
-                        prix: 59.99,
-                        note: 4,
-                        commandes: 150,
-                        enStock: false,
-                        img: require('@/assets/img/product/product-7.jpg'),
-                        promotion: {
-                            active: true,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                    {
-                        id: 5,
-                        nom: "Produit 5",
-                        prix: 59.99,
-                        note: 4,
-                        commandes: 150,
-                        enStock: false,
-                        img: require('@/assets/img/product/product-8.jpg'),
-                        promotion: {
-                            active: true,
-                            priceAfter: 25,
-                            percentage: '20%'
-                        }
-
-                    },
-                ],
+                FeaturedProduct:[],
+                idCategoryFeaturedProduct:''
 
             };
         },
@@ -413,18 +259,42 @@
                     const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
                     this.myProduct=response.data.product
                     this.imgSelected=this.myProduct.imgs[0]
+                    this.idCategoryFeaturedProduct=response.data.product.category
+                    await this.getProductsCategory()
                  
                 }
                 catch(error){
                     console.log('error get product in page product is :',error)
                 }
-            }
+            },
 
+            async getProductsCategory() {
+                try {
+                    const nameStore = this.$route.params.storeName
+                    const response = await axios.get(`http://localhost:3000/api/product/productsCategory/${nameStore}/${this.idCategoryFeaturedProduct}`)
+                    this.FeaturedProduct = response.data.products
+                    
+
+                } catch (error) {
+                    console.log(`error get all categories is ${error}`)
+                }
+            },
 
         },
+
+        watch: {
+            '$route.path': {
+                immediate: true,
+                handler() {
+                 this.getProduct()
+                },
+            }
+        },
+
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
             this.getProduct()
+
         },
     };
 </script>
