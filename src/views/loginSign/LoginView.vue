@@ -21,7 +21,10 @@
                             <b-col cols="12" class="mt-5" >
                                 <b-button id="btn-signup" class=" fw-bold w-100 h-input" >Log in</b-button>
                             </b-col>
-                            <p class="mt-2 text-center" >You don't have an account ? <router-link to="/Signup" ><a href="" class="text-decoration-underline text-primary" > Create one here.</a></router-link> </p>
+                            <p class="mt-2 text-center" >You don't have an account ? 
+                                <router-link tag="a" :to="`/${$route.params.storeName}/SignUp`"  >
+                                    <span  class="text-decoration-underline text-primary">Create one here.</span>
+                                </router-link> </p>
                         </b-row>
                     </b-form>
                 </b-col>

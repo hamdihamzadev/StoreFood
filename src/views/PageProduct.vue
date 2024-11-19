@@ -31,15 +31,19 @@
                         <div>
                             <h1 class="fw-bold mb-3"><strong>{{ myProduct.name }}</strong></h1>
                             <p class="mb-3"><span class="text-danger">
-                                    <b-form-rating v-model="Rating" inline no-border variant="warning"></b-form-rating>
+                                    <!-- <div>
+                                        <b-icon v-for="start in 3" :key="start.id"
+                                            :icon="start <= product.reviews ? 'star-fill' : 'star'"
+                                            :variant="start <= product.reviews ? 'warning' : 'secondary'">
+                                        </b-icon>
+                                    </div> -->
                                     ({{ myProduct.reviews.length }} Reviews)
                                 </span>
                             </p>
                             <!-- price start -->
                             <p v-if="myProduct.promotion.priceAfter">
                                 <strong class="fs-1">{{ myProduct.promotion.priceAfter}}$</strong>
-                                <span
-                                    class="ms-2 text-danger fs-4 text-decoration-line-through">{{ myProduct.price }}$
+                                <span class="ms-2 text-danger fs-4 text-decoration-line-through">{{ myProduct.price }}$
                                 </span>
                             </p>
                             <p class="fs-1" v-else>
@@ -50,13 +54,16 @@
 
                         </div>
                         <b-row>
+
                             <b-col lg="3" class="mb-3 mb-lg-0" style="height: 50px;">
                                 <b-form-spinbutton class="h-100" id="InputQuantity" v-model="ValueQuantity" min="1"
-                                    max="100">
+                                    :max="myProduct.quantity">
                                 </b-form-spinbutton>
                             </b-col>
                             <b-col lg="9" style="height: 50px;">
-                                <b-button :disabled="myProduct.quantity===0" id="btn-addPrd" class="h-100 w-100">
+                                <b-button @click="addToCart()" :disabled="myProduct.quantity===0" id="btn-addPrd"
+                                    class="h-100 w-100 d-flex align-items-center justify-content-center gap-3">
+                                    <b-icon icon="cart-plus" aria-hidden="true"></b-icon>
                                     <strong>ADD TO CART</strong>
                                 </b-button>
                             </b-col>
@@ -95,54 +102,63 @@
 
             <b-tabs id="tabs">
                 <b-tab title="Description" class="mt-5 px-2" active>
-                    <p class="fs-5 mb-2"><strong>Description</strong></p>
                     <b-card-text> {{myProduct.description}}</b-card-text>
                 </b-tab>
-                <b-tab title="Information" class="mt-5 px-2">
-                    <p class="fs-5 mb-2"><strong>Information</strong></p>
-                    <b-card-text>{{product.information}}</b-card-text>
-                </b-tab>
-                <b-tab title="Reviews" class="mt-5 px-2">
-                    <p class="fs-5 mb-2"><strong>Reviews</strong></p>
 
-                    <VueSlickCarousel v-bind="settings">
-                        <div v-for="item in 6" :key="item.id">
+                <b-tab title="Reviews" class="mt-5 px-2">
+
+                    <VueSlickCarousel v-if="myProduct.reviews.length>0" v-bind="settings">
+                        <div v-for="review in myProduct.reviews" :key="review.id">
                             <b-card class="p-md-4 ">
                                 <div class="d-flex gap-3 mb-4">
-                                    <b-img id="profil-customerReview" class="rounded "
-                                        :src="require('@/assets/img/featured/feature-6.jpg')"></b-img>
+                                    <b-img id="profil-customerReview" class="rounded " :src="review.customer.img">
+                                    </b-img>
                                     <div>
-                                        <p class="fw-bold fs-5">Jean Dupont</p>
-                                        <p class="small text-secondary">Publié le 15 juin 2023</p>
+                                        <p class="fw-bold fs-5">{{ review.customer.name }}</p>
+                                        <p class="small text-secondary">Publié le {{ review.date }}</p>
                                     </div>
                                 </div>
                                 <div>
                                     <div class="d-flex gap-3">
-                                        <b-form-rating v-model="Rating" inline no-border variant="warning">
-                                        </b-form-rating> <span>{{Rating}}.0</span>
+                                        <b-form-rating v-model="review.rating" inline no-border variant="warning">
+                                        </b-form-rating> <span>{{ review.rating }}</span>
                                     </div>
-                                    <p class="h6 mb-2"><strong>Excellent smartphone, très satisfait !</strong></p>
-                                    <p class="small text-secondary">J'ai acheté ce smartphone il y a un mois et je suis
-                                        vraiment impressionné par sa
-                                        qualité. L'écran est magnifique, l'appareil photo prend des photos superbes et
-                                        la
-                                        batterie dure toute la journée. Le service client de la boutique était également
-                                        très serviable. Je recommande vivement !</p>
+                                    <p class="h6 mb-2"><strong>{{ review.customer.name }}</strong></p>
+                                    <p class="small text-secondary">
+                                        {{ review.comment }}
+                                    </p>
                                 </div>
-
                             </b-card>
                         </div>
                     </VueSlickCarousel>
+                    <p v-else><strong>There are no product reviews.</strong></p>
 
                 </b-tab>
             </b-tabs>
 
             <!-- Related Product -->
-            <div id="RelatedProduct " style="margin-top: 7rem;">
-                <h2 id="titleRelatedProduct" class="fw-bold text-center mb-5">Featured Product</h2>
+            <div v-if="FeaturedProduct.length>0" id="RelatedProduct " style="margin-top: 7rem;">
+                <h2 id="titleRelatedProduct" class="fw-bold text-center mb-5">Related product</h2>
                 <ProductItem :products="FeaturedProduct" />
-            </div> 
+            </div>
 
+            <!-- modal connecte to account for shopping -->
+            <b-modal id="modal-connecte" title="BootstrapVue" hide-header hide-footer>
+                <h3><strong>Login required </strong></h3>
+                <p class="mb-4" >To purchase this product, you must be logged into your account. <br > 
+                    Please log in or create an account to proceed with your purchase
+                </p>
+                
+             
+                <div>
+                    <router-link :to="`/${$route.params.storeName}/Login`" >
+                        <b-button  id="btn-logInModal" class="me-2 px-4" >Log in</b-button>
+                    </router-link>
+                    <router-link :to="`/${$route.params.storeName}/Signup`">
+                        <b-button  id="btn-SignupModal" class="px-4" >Sign up</b-button>
+                    </router-link>
+                </div>
+            </b-modal>
 
         </b-container>
     </section>
@@ -183,9 +199,9 @@
 
                         },
                         {
-                            breakpoint: 1024, 
+                            breakpoint: 1024,
                             settings: {
-                                slidesToShow: 2, 
+                                slidesToShow: 2,
                                 slidesToScroll: 2,
                             },
                         },
@@ -235,9 +251,9 @@
                 activeLike: false,
                 showBottom: false,
 
-                myProduct:{},
-                FeaturedProduct:[],
-                idCategoryFeaturedProduct:''
+                myProduct: {},
+                FeaturedProduct: [],
+                idCategoryFeaturedProduct: ''
 
             };
         },
@@ -248,36 +264,58 @@
             },
 
             likeProduct() {
-                this.activeLike = !this.activeLike
-                this.showBottom = true
+                const tokenUser=localStorage.getItem('tokenuser')
+                if(!tokenUser){
+                    this.showModalConnect()
+                }else{
+                    this.activeLike = !this.activeLike
+                    this.showBottom = true
+                }
+
+                
             },
 
-            async getProduct(){
-                try{
-                    const nameStore=this.$route.params.storeName
-                    const id=this.$route.params.id
-                    const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
-                    this.myProduct=response.data.product
-                    this.imgSelected=this.myProduct.imgs[0]
-                    this.idCategoryFeaturedProduct=response.data.product.category
+            async getProduct() {
+                try {
+                    const nameStore = this.$route.params.storeName
+                    const id = this.$route.params.id
+                    const response = await axios.get(
+                        `http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
+                    this.myProduct = response.data.product
+                    this.imgSelected = this.myProduct.imgs[0]
+                    this.idCategoryFeaturedProduct = response.data.product.category
                     await this.getProductsCategory()
-                 
-                }
-                catch(error){
-                    console.log('error get product in page product is :',error)
+
+                } catch (error) {
+                    console.log('error get product in page product is :', error)
                 }
             },
 
             async getProductsCategory() {
                 try {
                     const nameStore = this.$route.params.storeName
-                    const response = await axios.get(`http://localhost:3000/api/product/productsCategory/${nameStore}/${this.idCategoryFeaturedProduct}`)
-                    this.FeaturedProduct = response.data.products
-                    
+                    const response = await axios.get(
+                        `http://localhost:3000/api/product/productsCategory/${nameStore}/${this.idCategoryFeaturedProduct}`
+                    )
+                    this.FeaturedProduct = response.data.products.filter(ele => ele._id !== this.$route.params.id)
 
                 } catch (error) {
                     console.log(`error get all categories is ${error}`)
                 }
+            },
+
+            showModalConnect(){
+                this.$bvModal.show('modal-connecte')
+            },
+
+            addToCart() {
+                const tokenUser=localStorage.getItem('tokenuser')
+                if(!tokenUser){
+                    this.showModalConnect()
+                }else{
+                    console.log(tokenUser)
+                }
+      
             },
 
         },
@@ -286,7 +324,7 @@
             '$route.path': {
                 immediate: true,
                 handler() {
-                 this.getProduct()
+                    this.getProduct()
                 },
             }
         },
@@ -294,6 +332,7 @@
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
             this.getProduct()
+            localStorage.clear('tokenuser')
 
         },
     };
@@ -423,5 +462,19 @@
         background-color: var(--thirday-color);
         margin: auto;
         margin-top: 10px;
+    }
+
+
+    /* modal connect  */
+    #btn-logInModal{
+        background-color: var(--thirday-color)
+    }
+
+    #btn-SignupModal{
+        border-color: var(--thirday-color);
+        background-color: transparent;
+        color: var(--thirday-color);
+        font-weight: 600;
+
     }
 </style>
