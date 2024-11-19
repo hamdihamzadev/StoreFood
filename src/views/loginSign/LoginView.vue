@@ -6,27 +6,49 @@
                     <router-link to="/" ><a href=""><b-img  class="w-15"  :src="require('@/assets/img/logo.png')" ></b-img></a></router-link>
                     <p class="fw-bold fs-5 mb-1 mt-4" ><strong>Create your account</strong></p>
                     <p class="mb-5 text-body-secondary" >Once registered, you will have access to all our features .</p>
-                    <b-form>
+                    <b-form @submit.prevent="loginAccount">
                         <b-row class="g-4" >
                                <b-col cols="12" >
-                                <label for="text-password">Email</label>
-                                <b-form-input class="h-input" type="email" id="text-password" aria-describedby="password-help-block"></b-form-input>
+                                <b-form-group label="Email">
+                                    <b-form-input 
+                                        required
+                                        class="h-input" 
+                                        type="email" 
+                                        id="text-password" 
+                                        aria-describedby="password-help-block">
+                                    </b-form-input>
+                                </b-form-group>
+                                <span class="small text-danger" v-show="errorEmail">email is incorrecte</span>
                             </b-col>
                             <b-col cols="12" >
-                                <label for="text-password">Password</label>
-                                <b-form-input class="h-input" type="password" id="text-password" aria-describedby="password-help-block"></b-form-input>
+                                <b-form-group label="Password">
+                                    <b-form-input 
+                                        required
+                                        class="h-input" 
+                                        type="password" 
+                                        id="text-password" 
+                                        aria-describedby="password-help-block">
+                                    </b-form-input>
+                                </b-form-group>
+                                <span class="small text-danger" v-show="errorPassword">password is incorrecte</span>
                                 <p  class="text-end small fw-semi-bold mt-1 text-primary cursor" >Forget Password</p>
                             </b-col>
 
                             <b-col cols="12" class="mt-5" >
-                                <b-button id="btn-signup" class=" fw-bold w-100 h-input" >Log in</b-button>
+                                <b-button 
+                                    type="submit"
+                                    id="btn-signup" 
+                                    class=" fw-bold w-100 h-input" >
+                                    Log in
+                                </b-button>
                             </b-col>
-                            <p class="mt-2 text-center" >You don't have an account ? 
-                                <router-link tag="a" :to="`/${$route.params.storeName}/SignUp`"  >
-                                    <span  class="text-decoration-underline text-primary">Create one here.</span>
-                                </router-link> </p>
                         </b-row>
                     </b-form>
+                    <p class="mt-2 text-center" >You don't have an account ? 
+                        <router-link tag="a" :to="`/${$route.params.storeName}/SignUp`"  >
+                            <span  class="text-decoration-underline text-primary">Create one here.</span>
+                        </router-link> 
+                   </p>
                 </b-col>
                 <!-- img -->
                 <b-col class="d-none d-lg-block">
@@ -41,7 +63,19 @@
 
 <script>
 export default{
-    name:'LoginView'
+    name:'LoginView',
+    data(){
+        return{
+            formLogin:{
+                email:'',
+                password:''
+            },
+            errorEmail:false,
+            errorPassword:false,
+        }
+    },
+
+ 
 }
 </script>
 
