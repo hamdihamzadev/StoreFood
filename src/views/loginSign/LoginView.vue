@@ -63,8 +63,8 @@
         data() {
             return {
                 formLogin: {
-                    email: '',
-                    password: '',
+                    email: 'hamzacustomer18@gmail.com',
+                    password: 'hahamalaha',
                     nameStore: '',
 
                 },
@@ -85,12 +85,16 @@
                 try {
 
                     if (this.formLogin.email !== '' && this.formLogin.password !== '') {
-                        const response = await axios.post(`http://localhost:3000/api/customers/login`, this.formLogin)
+                        const response = await axios.post(`http://localhost:3000/api/customers/login`, this
+                            .formLogin)
                         if (response.data.message === 'Login is finish with successful') {
                             this.errorEmail.show = false
                             this.errorPassword.show = false
-                            localStorage.setItem('tokenCustomer', JSON.stringify(response.data.token))
-                            this.$router.push(`/${this.$route.params.storeName}`)
+                            localStorage.setItem('tokenCustomer', response.data.token)
+                            const targetRoute = `/${this.$route.params.storeName}`;
+                            if (this.$route.path !== targetRoute) {
+                                this.$router.push(targetRoute)
+                            }
                         }
                     }
 
