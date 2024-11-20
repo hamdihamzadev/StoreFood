@@ -8,8 +8,8 @@ import PageProduct from '../views/PageProduct.vue'
 import ShopingCart from '@/views/shoppingcart/ShopingCart.vue'
 import ChecKout from '@/views/checkout/ChecKout.vue'
 import BlogDetail from '@/views/blogDetails/BlogDetails.vue'
-import SignUp from '@/views/login/SignUp.vue'
-import LoginView from '@/views/login/LoginView.vue'
+import SignupView from '@/views/loginSign/SignUp.vue'
+import LoginView from '@/views/loginSign/LoginView.vue'
 import ListCategories from '../views/category/ListCategories.vue'
 
 
@@ -72,7 +72,7 @@ const routes = [
   {
     path: '/:storeName/Signup',
     name: 'SignUp',
-    component:SignUp,
+    component:SignupView,
     
   },
 
