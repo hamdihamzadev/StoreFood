@@ -3,7 +3,7 @@
         <!-- topBar -->
         <div id="topbar" class="d-none d-md-block">
             <b-container class="px-lg-5">
-                <b-row>
+                <b-row class="d-flex align-items-center ">
                     <b-col>
                         <div class="d-flex gap-3">
                             <p class="fs-14">
@@ -11,21 +11,52 @@
                                 <span>teste@gmail.com</span>
                             </p>
                             <p class="fs-14 border-start ps-3">
-                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99 {{ nameStore }}</p>
+                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99 {{ nameStore }}
+                            </p>
                         </div>
                     </b-col>
                     <b-col>
-                        <div class="d-flex justify-content-end gap-4 ">
+                        <div class="d-flex justify-content-end align-items-center  gap-4 ">
                             <div id="soical-media">
                                 <b-icon class="me-3" icon="facebook" aria-hidden="true"></b-icon>
                                 <b-icon class="me-3" icon="twitter" aria-hidden="true"></b-icon>
                                 <b-icon class="me-3" icon="linkedin" aria-hidden="true"></b-icon>
                                 <b-icon icon="facebook" aria-hidden="true"></b-icon>
                             </div>
-                            <div class="ps-2 border-start">
-                                <router-link tag="a" to="/Login">
+                            <div class="ps-2 border-start position-relative">
+                                <router-link v-if="isTokenAvailable()==='noConnected'" tag="a" :to="`/${$route.params.storeName}/Login`">
                                     <b-icon class="me-2" icon="person-fill" aria-hidden="true"></b-icon>Login
                                 </router-link>
+                                <b-button v-else v-b-toggle.collapse-profile
+                                    class="d-flex align-items-center justify-content-between gap-2 border-0 text-black bg-transparent">
+                                    <b-avatar
+                                        src="http://localhost:3000/images/Design_sans_titre__3_-removebg-preview%202-1731598358423-40625322.png"
+                                        variant="dark"></b-avatar>
+                                    <strong>Hamza hamdi</strong>
+                                    <b-icon icon="chevron-down" aria-hidden="true"></b-icon>
+                                </b-button>
+                                <!-- Collapse -->
+                                <b-collapse id="collapse-profile"
+                                    class="mt-2 position-absolute start-0 end-0 z-3 shadow">
+                                    <b-card class="p-0">
+                                        <nav class="d-flex flex-column gap-2 ">
+                                            <router-link v-for="item in linksProfil" :key="item.id"
+                                                :to="`/${$route.params.storeName}${item.path}`" tag="li">
+                                                <b-icon :icon="item.icon" class="me-2" aria-hidden="true"></b-icon>
+                                                <a href="">{{ item.text }}</a>
+                                            </router-link>
+                                        </nav>
+                                        <hr class="m-2">
+                                        <li>
+                                            <a href="" @click="logout">
+                                                <b-icon icon="box-arrow-in-right" class="me-2" aria-hidden="true">
+                                                </b-icon>
+                                                <span>Logout</span>
+                                            </a>
+                                        </li>
+                                    </b-card>
+                                </b-collapse>
+
                             </div>
                         </div>
                     </b-col>
@@ -49,20 +80,19 @@
                     <b-col lg="4" class="d-none d-lg-block">
                         <!-- hidden in sm and md -->
                         <nav class="d-flex justify-content-between ">
-                            <router-link v-for="(item,index) in links" :key="item.id" tag="li" :to="`/${$route.params.storeName}${item.path}`">
+                            <router-link v-for="(item,index) in links" :key="item.id" tag="li"
+                                :to="`/${$route.params.storeName}${item.path}`">
                                 <a :id="item.id" @click="toggleActive(index)" class="small fw-bold"
                                     :class="{'ActiveLink':activeIndex===index}" href="">
-                                    {{ item.text }} <b-icon v-if="item.children" icon="chevron-down" aria-hidden="true">
-                                    </b-icon>
+                                    {{ item.text }}
+                                    <b-icon v-if="item.children" icon="chevron-down" aria-hidden="true"></b-icon>
                                 </a>
 
-                                <b-popover  target="popover-pages" triggers="hover" placement="top">
-                                    <router-link 
-                                       v-for="child in item.children" 
-                                       :key="child.id" 
-                                       tag="li"
-                                       :to="`/${$route.params.storeName}${child.path}`">
-                                        <a id="links-pages" class="text-decoration-none d-block w-100 mb-2 " href="">{{ child.text }} </a>
+                                <b-popover target="popover-pages" triggers="hover" placement="top">
+                                    <router-link v-for="child in item.children" :key="child.id" tag="li"
+                                        :to="`/${$route.params.storeName}${child.path}`">
+                                        <a id="links-pages" class="text-decoration-none d-block w-100 mb-2 "
+                                            href="">{{ child.text }} </a>
                                     </router-link>
                                 </b-popover>
 
@@ -144,9 +174,6 @@
                         </div>
                     </b-col>
 
-
-
-
                 </b-row>
             </b-container>
         </div>
@@ -154,6 +181,8 @@
 </template>
 
 <script>
+    import axios from 'axios';
+
     export default {
         name: 'HeaderComp',
         data() {
@@ -170,8 +199,7 @@
                         path: '#',
                         text: "PAGES",
                         id: 'popover-pages',
-                        children: [
-                            {
+                        children: [{
                                 path: '/PageProduct',
                                 text: 'Page Product'
                             },
@@ -195,11 +223,42 @@
                         text: "CONTACT"
                     },
                 ],
+
+                linksProfil: [{
+                        path: '/Myaccount',
+                        text: 'My account',
+                        icon: 'person'
+                    },
+                    {
+                        path: '/Orders',
+                        text: 'Orders',
+                        icon: 'bag'
+                    },
+                    {
+                        path: '/Settings',
+                        text: 'Settings',
+                        icon: 'gear'
+                    },
+                ],
                 activeIndex: 0,
+                userConnected: {},
+                showCollapseProfil: false
             }
         },
 
+
+
+
         methods: {
+
+            isTokenAvailable(){
+                const token=localStorage.getItem('tokenCustomer')
+                if(token){
+                    return 'Connected'
+                }else{
+                     return 'noConnected'
+                }
+            },
 
             toggleActive(index) {
                 setTimeout(() => {
@@ -212,10 +271,37 @@
                 this.activeIndex = index
             },
 
+            async getUserConnected() {
+                try {
+                    const nameStore = this.$route.params.storeName
+                    // const token=localStorage.getItem('tokenCustomer')
+                    const response = axios.get(`http://localhost:3000/api/customers/CustomerConnected/${nameStore}`
+                        // ,
+                        // {
+                        //     headers:{
+                        //         Authorization: `Bearer ${JSON.parse(token)}`
+                        //     }
+                        // }
+
+                    )
+                    this.userConnected = response.data.customer
+
+                } catch (error) {
+                    console.log('error the get user connected is :', error)
+                }
+            },
+
+            logout() {
+                localStorage.clear('tokenCustomer')
+                window.location.reload()
+            }
+
         },
 
         mounted() {
             this.toggleActiveMounted()
+            this.getUserConnected()
+            this.isTokenAvailable()
         }
     }
 </script>
@@ -250,10 +336,35 @@
 
     }
 
-    #links-pages{
+    #links-pages {
         color: black;
-        &:hover{
-            color:var(--thirday-color);
+
+        &:hover {
+            color: var(--thirday-color);
+        }
+    }
+
+    ::v-deep #collapse-profile .card-body {
+        padding-inline: 0px;
+        padding-block: 15px;
+
+
+        li {
+            padding-inline: 10px;
+            padding-block: 5px;
+            display: flex;
+            align-items: center;
+
+            a {
+                display: block;
+                width: 100%;
+
+            }
+
+            &:hover {
+                background-color: rgb(226, 226, 226)
+            }
+
         }
     }
 </style>

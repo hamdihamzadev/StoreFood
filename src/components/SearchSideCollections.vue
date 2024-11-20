@@ -18,7 +18,7 @@
                                         :key="item.id" 
                                         :to="`/${$route.params.storeName}/Categories/${item.namecategory}/${item.id}`" 
                                         tag="li">
-                                        <a href="">{{ item.namecategory }}</a>
+                                        <a href="" @click="showHideCollpase" :class="{'fw-bold':item.id===$route.params.id}" >{{ item.namecategory }}</a>
                                     </router-link>
                                 </nav>
                             </b-card>
@@ -61,6 +61,12 @@
     export default {
         name: 'SearchSideCollections',
 
+        data(){
+            return{
+                isCollapseOpen: false,
+            }
+        },
+
         computed: {
             ...mapState('category', {
                 linkCategories: state => state.categories
@@ -71,7 +77,11 @@
         methods: {
             ...mapActions("category", {
                 fetchCategories: 'ac_getCategories'
-            })
+            }),
+
+            closeCollapse(){
+                this.$root.$emit('bv::collapse::hide',)
+            }
         },
 
         mounted(){
