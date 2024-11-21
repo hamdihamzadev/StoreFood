@@ -5,9 +5,8 @@
         </div>
         <b-container class="px-lg-5 ">
 
-
-            <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
-            responsive >
+            <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="cartUser" hover
+                responsive>
                 <template #cell(Product)="data">
                     <div class="d-flex gap-3 align-items-center">
                         <b-img id="img-product" :src="data.item.Product.img"></b-img>
@@ -17,7 +16,7 @@
                 <template #cell(Quantity)="data">
 
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
-                        <b-form-spinbutton class="text-center w-50 h-50" id="InputQuantity" v-model="data.item.Quantity"
+                        <b-form-spinbutton class="text-center w-50 h-50" id="InputQuantity" v-model="data.value"
                             min="1" max="100">
                         </b-form-spinbutton>
                     </div>
@@ -36,17 +35,27 @@
 
                 </template>
 
+                <template #head(id)>
+                    <th class="d-none"></th>
+                </template>
+
+                <template #cell(id)="data">
+                    <td class="d-none">{{ data.value }}</td>
+                </template>
+
 
             </b-table>
             <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
             </b-pagination>
             <b-row class="mt-5">
-                <b-col  cols="12" lg="6"  >
-                    <b-button class="px-5 py-3  w-100 mb-2 mb-lg-" id="btn-updatecart"><strong class="small">CONTINUE SHOPPING</strong>
+                <b-col cols="12" lg="6">
+                    <b-button class="px-5 py-3  w-100 mb-2 mb-lg-" id="btn-updatecart"><strong class="small">CONTINUE
+                            SHOPPING</strong>
                     </b-button>
                 </b-col>
                 <b-col cols="12" lg="6" class="d-flex justify-content-lg-end">
-                    <b-button id="btn-continuershop" class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 ">
+                    <b-button id="btn-continuershop"
+                        class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 ">
                         <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon> <strong class="small">UPDATE
                             CART</strong>
                     </b-button>
@@ -56,27 +65,34 @@
 
             <b-row class="mt-5">
                 <!-- discount and  -->
-                <b-col  cols="12" lg="6" class="pe-lg-5 mb-3 mb-lg-0" >
-                    <p class="mb-4 fs-5 fw-bold" ><strong>Discount Codes</strong></p>
-                
-                    <b-form class="d-flex gap-3 flex-column flex-lg-row" >
+                <b-col cols="12" lg="6" class="pe-lg-5 mb-3 mb-lg-0">
+                    <p class="mb-4 fs-5 fw-bold"><strong>Discount Codes</strong></p>
+
+                    <b-form class="d-flex gap-3 flex-column flex-lg-row">
                         <b-form-input id="input-coupon" class="h-100 " placeholder="Enter your coupon">
                         </b-form-input>
-                        <b-button class="fw-bold w-100 w-lg-50" >APPLY COUPON</b-button>
+                        <b-button class="fw-bold w-100 w-lg-50">APPLY COUPON</b-button>
                     </b-form>
                 </b-col>
 
-                <b-col cols="12" lg="6"   >
-                    <div class="p-4 rounded" id="bg-total"  >
-                        <p class="mb-4 fs-4 fw-bold" ><strong>Cart Total</strong></p>
-                        <div class="d-flex justify-content-between fw-bold fs-5"><p>Subtotal</p><p class="text-danger" >488$</p></div>
+                <b-col cols="12" lg="6">
+                    <div class="p-4 rounded" id="bg-total">
+                        <p class="mb-4 fs-4 fw-bold"><strong>Cart Total</strong></p>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <p>Subtotal</p>
+                            <p class="text-danger">488$</p>
+                        </div>
                         <hr>
-                        <div class="d-flex justify-content-between fw-bold fs-5"><p >Total</p><p class="text-danger" >488$</p></div>
-                        <b-button class="mt-4 w-100 py-2 fw-bold small " id="btn-tocheckout" >PROCEED TO CHECKOUT</b-button>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <p>Total</p>
+                            <p class="text-danger">488$</p>
+                        </div>
+                        <b-button class="mt-4 w-100 py-2 fw-bold small " id="btn-tocheckout">PROCEED TO CHECKOUT
+                        </b-button>
                     </div>
                 </b-col>
-          
-    
+
+
             </b-row>
 
         </b-container>
@@ -85,6 +101,8 @@
 
 <script>
     import breadCrumb from "@/components/BreadCrumb.vue"
+    import axios from "axios";
+
     export default {
         name: 'ShopingCart',
         components: {
@@ -135,12 +153,49 @@
                 ],
                 currentPage: 1,
                 perPage: 5,
+                cartUser: [],
             }
         },
         computed: {
             rows() {
                 return this.items.length
             }
+        },
+
+        methods: {
+            async getCartUser() {
+                try {
+                    const token = localStorage.getItem('tokenCustomer')
+                    const response = await axios.get(
+                        `http://localhost:3000/api/cart/getCart/${this.$route.params.storeName}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            }
+                        })
+                    this.cartUser = response.data.cart.items
+                        .map(item => {
+                            return {
+                                Product: {
+                                    img: item.product.imgs[0],
+                                    name: item.product.name
+                                },
+                                Price: item.product.promotion.priceAfter > 0 ? item.product.promotion
+                                    .priceAfter : item.product.price,
+                                Quantity: item.quantity,
+                                Total: (item.product.promotion.priceAfter > 0 ? item.product.promotion.priceAfter : item.product.price) * item.quantity  ,
+                                delete: 'x-circle',
+                                id: item._id
+                            }
+                        })
+
+                } catch (error) {
+                    console.log(`error get cart use is :${error}`)
+                }
+            },
+        },
+
+        mounted() {
+            this.getCartUser()
         }
     }
 </script>
@@ -168,16 +223,17 @@
         border: var(--secondary-color);
         color: #929292;
     }
-    #btn-tocheckout{
+
+    #btn-tocheckout {
         background-color: var(--thirday-color);
         border: none;
     }
 
-    #bg-total{
+    #bg-total {
         background-color: var(--secondary-color);
     }
 
-    #input-coupon:focus{
+    #input-coupon:focus {
         box-shadow: none;
         border-color: inherit;
     }

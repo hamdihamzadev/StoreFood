@@ -256,7 +256,11 @@
             totalShoppingCart(){
                 let total=0
                 if(this.cartUser.length!==0){
-                    total=this.cartUser.reduce((accu,item)=>accu+item.total,0)
+                    total=this.cartUser
+                    .map(item=>{
+                       return (item.product.promotion.priceAfter>0 ? item.product.promotion.priceAfter : item.product.price) * item.quantity
+                    } )
+                    .reduce((accu,total)=>accu+total,0)
                 }
                 return total
             }
@@ -338,6 +342,8 @@
             this.getUserConnected()
             this.isTokenAvailable()
             this.getCartUser()
+
+
         }
     }
 </script>

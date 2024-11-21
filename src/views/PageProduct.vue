@@ -215,11 +215,7 @@
                 myProduct: {},
                 FeaturedProduct: [],
                 idCategoryFeaturedProduct: '',
-                formItem:{
-                    product:'',
-                    quantity:'',
-                    total:'',
-                }
+                
 
             };
         },
@@ -275,11 +271,11 @@
             },
 
             addToCart() {
-                const tokenUser=localStorage.getItem('tokenuser')
-                if(!tokenUser){
-                    this.showModalConnect()
+                const tokenUser=localStorage.getItem('tokenCustomer')
+                if(tokenUser){
+                    this.addItemToCart()
                 }else{
-                    console.log(tokenUser)
+                    this.showModalConnect()
                 }
       
             },
@@ -288,19 +284,23 @@
             async addItemToCart(){
                 try{
                     const token=localStorage.getItem('tokenCustomer')
-                    const response=await axios.post(`http://localhost:3000/api/cart/addItem/${this.$route.params.storeName}`,this.formItem,{
+                    const formItem={
+                        product:this.$route.params.id,
+                        quantity:this.ValueQuantity,
+                    }
+                    const response=await axios.post(`http://localhost:3000/api/cart/addItem/${this.$route.params.storeName}`,formItem,{
                         headers:{
                             Authorization: `Bearer ${token}`
                         }
                     })
-
                     console.log(response.data.message)
 
                 }
                 catch(error){
                     console.log(`error add item to cart is: ${error}`)
                 }
-            }
+            },
+
 
         },
 
@@ -316,7 +316,6 @@
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
             this.getProduct()
-            localStorage.clear('tokenuser')
 
         },
     };
