@@ -42,7 +42,7 @@
                             <span class="text-decoration-underline text-primary">Create one here.</span>
                         </router-link>
                     </p>
-                    <p>{{ formLogin }}</p>
+
                 </b-col>
                 <!-- img -->
                 <b-col class="d-none d-lg-block">
@@ -91,6 +91,7 @@
                             this.errorEmail.show = false
                             this.errorPassword.show = false
                             localStorage.setItem('tokenCustomer', response.data.token)
+                            this.createCartCustomer()
                             const targetRoute = `/${this.$route.params.storeName}`;
                             if (this.$route.path !== targetRoute) {
                                 this.$router.push(targetRoute)
@@ -112,16 +113,30 @@
                         this.errorPassword.text = 'Passwrod is incorrecte'
                     }
                 }
-
             },
 
+            // CREATE CART CUSTOMER
+            async createCartCustomer() {
+                try {
+                    const token = localStorage.getItem('tokenCustomer')
+                    await axios.post(`http://localhost:3000/api/cart/newCart`, {
+                        nameStore: this.$route.params.storeName
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    })
+                 
+                } catch (error) {
+                    console.log(`error create cart user is ${error}`)
+                }
+            },
+           
         },
 
         mounted() {
             this.formLogin.nameStore = this.$route.params.storeName
         }
-
-
     }
 </script>
 

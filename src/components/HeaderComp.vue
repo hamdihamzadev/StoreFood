@@ -56,7 +56,6 @@
                                         </li>
                                     </b-card>
                                 </b-collapse>
-
                             </div>
                         </div>
                     </b-col>
@@ -167,10 +166,16 @@
 
                     <b-col lg="4" class="mt-3 mt-lg-0">
                         <div id="header-cart"
-                            class="d-flex align-items-center justify-content-center  justify-content-lg-end ">
-                            <b-avatar icon="heart-fill" badge badge-top badge-offset="-2px"></b-avatar>
-                            <b-avatar icon="basket2-fill" badge badge-top badge-offset="-2px"></b-avatar>
-                            <p class="fs-14">item : <strong>$150.00</strong></p>
+                            class="d-flex align-items-center justify-content-center  justify-content-lg-end  gap-1">
+                            <router-link></router-link>
+                            <router-link :to="`/${$route.params.storeName}/Favoris`" >
+                                <b-icon class="fs-4 me-2 cursor"  icon="heart" aria-hidden="true"></b-icon>
+                            </router-link>
+                            <router-link :to="`/${$route.params.storeName}/Shopingcart`" >
+                                <b-icon class="fs-4 cursor" icon="cart3" aria-hidden="true"></b-icon>
+                            </router-link>
+                        
+                            <p class="fs-14">Total cart <strong>${{ totalShoppingCart }}</strong></p>
                         </div>
                     </b-col>
 
@@ -242,10 +247,20 @@
                 ],
                 activeIndex: 0,
                 userConnected: {},
-                showCollapseProfil: false
+                showCollapseProfil: false,
+                cartUser:[]
             }
         },
 
+        computed:{
+            totalShoppingCart(){
+                let total=0
+                if(this.cartUser.length!==0){
+                    total=this.cartUser.reduce((accu,item)=>accu+item.total,0)
+                }
+                return total
+            }
+        },
 
 
 
@@ -291,10 +306,30 @@
                 }
             },
 
+ 
+
             logout() {
                 localStorage.clear('tokenCustomer')
                 window.location.reload()
-            }
+            },
+
+
+            // GET CART USER
+            async getCartUser() {
+                try {
+                    const token = localStorage.getItem('tokenCustomer')
+                   const response= await axios.get(`http://localhost:3000/api/cart/getCart/${this.$route.params.storeName}`,
+                     {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    })
+                    this.cartUser= response.data.cart.items
+                 
+                } catch (error) {
+                    console.log(`error get cart use is :${error}`)
+                }
+            },
 
         },
 
@@ -302,6 +337,7 @@
             this.toggleActiveMounted()
             this.getUserConnected()
             this.isTokenAvailable()
+            this.getCartUser()
         }
     }
 </script>
@@ -367,4 +403,6 @@
 
         }
     }
+
+    .cursor{cursor: pointer;}
 </style>

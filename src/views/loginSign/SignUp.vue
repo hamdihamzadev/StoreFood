@@ -199,7 +199,8 @@
                 } catch (error) {
                     console.log('error get countrie is :', error)
                 }
-            }
+            },
+
         },
 
         mounted() {
