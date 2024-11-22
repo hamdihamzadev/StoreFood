@@ -8,7 +8,7 @@
                 <b-col lg="6">
                     <div class="position-relative">
                         <b-img class="w-100 mb-3" :src="imgSelected"></b-img>
-                        <button :disabled="product.availability===false" @click="likeProduct"
+                        <button :disabled="myProduct.quantity===0" @click="likeProduct"
                             :class="{'activeLike':activeLike===true,'disabledLike':activeLike===false}"
                             class="d-flex align-items-center p-3 rounded position-absolute">
                             <b-icon class="fw-bold" :icon="activeLike?'suit-heart-fill':'suit-heart'"
@@ -169,6 +169,7 @@
     import VueSlickCarousel from 'vue-slick-carousel'
     import ProductItem from '../components/ProductItem.vue'
     import axios from 'axios';
+import { mapActions } from 'vuex';
 
     export default {
         name: 'PageProduct',
@@ -207,45 +208,6 @@
                         },
                     ],
                 },
-                product: {
-                    name: "Vegetable's Package",
-                    price: 70,
-                    promotion: {
-                        active: true,
-                        priceAfter: 50
-                    },
-                    imgs: [
-                        require('@/assets/img/product/product-1.jpg'),
-                        require('@/assets/img/product/product-2.jpg'),
-                        require('@/assets/img/product/product-3.jpg'),
-                        require('@/assets/img/product/product-5.jpg'),
-                        require('@/assets/img/product/product-6.jpg'),
-                        require('@/assets/img/product/product-7.jpg'),
-                        require('@/assets/img/product/product-8.jpg'),
-                    ],
-                    availability: true,
-                    shipping: '01 day shipping',
-                    weight: '0.5 Kg',
-                    para: `Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Proin eget tortor risus.`,
-                    description: `Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Pellentesque in ipsum id orci porta dapibus. Proin eget tortor risus. Vivamus suscipit tortor eget felis porttitor volutpat. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Donec rutrum congue leo eget malesuada. Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus.Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Cras ultricies ligula sed magna dictum porta. Cras ultricies ligula sed magna dictum porta. Sed porttitor lectus nibh. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Proin eget tortor risus.`,
-                    information: `Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Pellentesque in ipsum id orci porta dapibus. Proin eget tortor risus. Vivamus suscipit tortor eget felis porttitor volutpat. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Donec rutrum congue leo eget malesuada. Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus.`,
-                    reviews: [{
-                            name: 'hodza',
-                            comment: 'Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.',
-                            date: '08/05/2024'
-                        },
-                        {
-                            name: 'hodza',
-                            comment: 'Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.',
-                            date: '08/05/2024'
-                        },
-                        {
-                            name: 'hodza',
-                            comment: 'Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.',
-                            date: '08/05/2024'
-                        },
-                    ],
-                },
                 ValueQuantity: 1,
                 imgSelected: require('@/assets/img/product/product-1.jpg'),
                 activeLike: false,
@@ -253,7 +215,8 @@
 
                 myProduct: {},
                 FeaturedProduct: [],
-                idCategoryFeaturedProduct: ''
+                idCategoryFeaturedProduct: '',
+                
 
             };
         },
@@ -306,14 +269,29 @@
             },
 
             addToCart() {
-                const tokenUser=localStorage.getItem('tokenuser')
-                if(!tokenUser){
-                    this.showModalConnect()
+                const tokenUser=localStorage.getItem('tokenCustomer')
+                if(tokenUser){
+                    this.addItemToCart()
                 }else{
-                    console.log(tokenUser)
+                    this.showModalConnect()
                 }
       
             },
+
+            // ADD ITEM TO CART
+             addItemToCart(){
+                const formItem={
+                    product:this.$route.params.id,
+                    quantity:this.ValueQuantity,
+                }
+                this.addItemToCartAction(formItem)
+            },
+
+            // ADD ITEM TO CART
+            ...mapActions('cart',{
+                addItemToCartAction:'ac_addItem'
+            }),
+
 
         },
 
@@ -329,7 +307,6 @@
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
             this.getProduct()
-            localStorage.clear('tokenuser')
 
         },
     }

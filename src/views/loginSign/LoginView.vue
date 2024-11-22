@@ -42,7 +42,7 @@
                             <span class="text-decoration-underline text-primary">Create one here.</span>
                         </router-link>
                     </p>
-                    <p>{{ formLogin }}</p>
+
                 </b-col>
                 <!-- img -->
                 <b-col class="d-none d-lg-block">
@@ -57,7 +57,8 @@
 
 <script>
     import axios from 'axios';
-
+    import { mapActions } from 'vuex';
+    
     export default {
         name: 'LoginView',
         data() {
@@ -91,6 +92,10 @@
                             this.errorEmail.show = false
                             this.errorPassword.show = false
                             localStorage.setItem('tokenCustomer', response.data.token)
+
+                            // CREATE CART CUSTOMER
+                            this.createCart()
+
                             const targetRoute = `/${this.$route.params.storeName}`;
                             if (this.$route.path !== targetRoute) {
                                 this.$router.push(targetRoute)
@@ -112,16 +117,19 @@
                         this.errorPassword.text = 'Passwrod is incorrecte'
                     }
                 }
-
             },
+
+            // CREATE CART CUSTOMER
+            ...mapActions("cart", {
+                createCart: 'ac_createCart'
+            }),
+
 
         },
 
         mounted() {
             this.formLogin.nameStore = this.$route.params.storeName
         }
-
-
     }
 </script>
 

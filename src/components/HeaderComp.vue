@@ -11,7 +11,7 @@
                                 <span>teste@gmail.com</span>
                             </p>
                             <p class="fs-14 border-start ps-3">
-                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99 {{ nameStore }}
+                                <font-awesome-icon icon="twitter" />Free Shipping for all Order of $99 
                             </p>
                         </div>
                     </b-col>
@@ -24,7 +24,8 @@
                                 <b-icon icon="facebook" aria-hidden="true"></b-icon>
                             </div>
                             <div class="ps-2 border-start position-relative">
-                                <router-link v-if="isTokenAvailable()==='noConnected'" tag="a" :to="`/${$route.params.storeName}/Login`">
+                                <router-link v-if="isTokenAvailable()==='noConnected'" tag="a"
+                                    :to="`/${$route.params.storeName}/Login`">
                                     <b-icon class="me-2" icon="person-fill" aria-hidden="true"></b-icon>Login
                                 </router-link>
                                 <b-button v-else v-b-toggle.collapse-profile
@@ -56,7 +57,6 @@
                                         </li>
                                     </b-card>
                                 </b-collapse>
-
                             </div>
                         </div>
                     </b-col>
@@ -167,10 +167,17 @@
 
                     <b-col lg="4" class="mt-3 mt-lg-0">
                         <div id="header-cart"
-                            class="d-flex align-items-center justify-content-center  justify-content-lg-end ">
-                            <b-avatar icon="heart-fill" badge badge-top badge-offset="-2px"></b-avatar>
-                            <b-avatar icon="basket2-fill" badge badge-top badge-offset="-2px"></b-avatar>
-                            <p class="fs-14">item : <strong>$150.00</strong></p>
+                            class="d-flex align-items-center justify-content-center  justify-content-lg-end  gap-1">
+                            <router-link></router-link>
+                            <router-link :to="`/${$route.params.storeName}/Favoris`">
+                                <b-icon class="fs-4 me-2 cursor" icon="heart" aria-hidden="true"></b-icon>
+                            </router-link>
+                            <router-link :to="`/${$route.params.storeName}/Shopingcart`">
+                                <b-avatar icon="cart3" badge-variant="danger" variant="primary" 
+                                :badge="cartUser.items && cartUser.items.length ? cartUser.items.length : 0">
+                                </b-avatar>
+                            </router-link>
+              
                         </div>
                     </b-col>
 
@@ -182,6 +189,7 @@
 
 <script>
     import axios from 'axios';
+import { mapActions, mapState } from 'vuex';
 
     export default {
         name: 'HeaderComp',
@@ -242,21 +250,26 @@
                 ],
                 activeIndex: 0,
                 userConnected: {},
-                showCollapseProfil: false
+                showCollapseProfil: false,
             }
         },
 
 
+        computed:{
+            ...mapState('cart', {
+                cartUser: state => state.cart
+            }),
+        },
 
 
         methods: {
 
-            isTokenAvailable(){
-                const token=localStorage.getItem('tokenCustomer')
-                if(token){
+            isTokenAvailable() {
+                const token = localStorage.getItem('tokenCustomer')
+                if (token) {
                     return 'Connected'
-                }else{
-                     return 'noConnected'
+                } else {
+                    return 'noConnected'
                 }
             },
 
@@ -291,10 +304,19 @@
                 }
             },
 
+
+
             logout() {
                 localStorage.clear('tokenCustomer')
+                localStorage.clear('cartUser')
                 window.location.reload()
-            }
+            },
+
+
+            // GET CART USER
+            ...mapActions('cart',{
+                getCartUser:'ac_getCart'
+            })
 
         },
 
@@ -302,6 +324,10 @@
             this.toggleActiveMounted()
             this.getUserConnected()
             this.isTokenAvailable()
+            this.getCartUser()
+            console.log(this.cartUser)
+
+
         }
     }
 </script>
@@ -366,5 +392,9 @@
             }
 
         }
+    }
+
+    .cursor {
+        cursor: pointer;
     }
 </style>
