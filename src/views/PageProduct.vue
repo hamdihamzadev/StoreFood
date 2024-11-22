@@ -169,6 +169,7 @@
     import VueSlickCarousel from 'vue-slick-carousel'
     import ProductItem from '../components/ProductItem.vue'
     import axios from 'axios';
+import { mapActions } from 'vuex';
 
     export default {
         name: 'PageProduct',
@@ -281,25 +282,18 @@
             },
 
             // ADD ITEM TO CART
-            async addItemToCart(){
-                try{
-                    const token=localStorage.getItem('tokenCustomer')
-                    const formItem={
-                        product:this.$route.params.id,
-                        quantity:this.ValueQuantity,
-                    }
-                    const response=await axios.post(`http://localhost:3000/api/cart/addItem/${this.$route.params.storeName}`,formItem,{
-                        headers:{
-                            Authorization: `Bearer ${token}`
-                        }
-                    })
-                    console.log(response.data.message)
-
+             addItemToCart(){
+                const formItem={
+                    product:this.$route.params.id,
+                    quantity:this.ValueQuantity,
                 }
-                catch(error){
-                    console.log(`error add item to cart is: ${error}`)
-                }
+                this.addItemToCartAction(formItem)
             },
+
+            // ADD ITEM TO CART
+            ...mapActions('cart',{
+                addItemToCartAction:'ac_addItem'
+            }),
 
 
         },

@@ -57,7 +57,8 @@
 
 <script>
     import axios from 'axios';
-
+    import { mapActions } from 'vuex';
+    
     export default {
         name: 'LoginView',
         data() {
@@ -91,7 +92,10 @@
                             this.errorEmail.show = false
                             this.errorPassword.show = false
                             localStorage.setItem('tokenCustomer', response.data.token)
-                            this.createCartCustomer()
+
+                            // CREATE CART CUSTOMER
+                            this.createCart()
+
                             const targetRoute = `/${this.$route.params.storeName}`;
                             if (this.$route.path !== targetRoute) {
                                 this.$router.push(targetRoute)
@@ -116,22 +120,11 @@
             },
 
             // CREATE CART CUSTOMER
-            async createCartCustomer() {
-                try {
-                    const token = localStorage.getItem('tokenCustomer')
-                    await axios.post(`http://localhost:3000/api/cart/newCart`, {
-                        nameStore: this.$route.params.storeName
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        }
-                    })
-                 
-                } catch (error) {
-                    console.log(`error create cart user is ${error}`)
-                }
-            },
-           
+            ...mapActions("cart", {
+                createCart: 'ac_createCart'
+            }),
+
+
         },
 
         mounted() {

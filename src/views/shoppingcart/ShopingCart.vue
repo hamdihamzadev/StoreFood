@@ -4,8 +4,7 @@
             <breadCrumb :titlebreadcrumb="'Shopping cart'" />
         </div>
         <b-container class="px-lg-5 ">
-
-            <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="cartUser" hover
+            <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
                 responsive>
                 <template #cell(Product)="data">
                     <div class="d-flex gap-3 align-items-center">
@@ -16,8 +15,8 @@
                 <template #cell(Quantity)="data">
 
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
-                        <b-form-spinbutton class="text-center w-50 h-50" id="InputQuantity" v-model="data.value"
-                            min="1" max="100">
+                        <b-form-spinbutton class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]"
+                            min="1" :max="data.value[1]" @change="onQuantityChange(data.item.id , data.value[0])">
                         </b-form-spinbutton>
                     </div>
 
@@ -46,7 +45,8 @@
 
             </b-table>
             <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
-            </b-pagination>
+            </b-pagination> 
+
             <b-row class="mt-5">
                 <b-col cols="12" lg="6">
                     <b-button class="px-5 py-3  w-100 mb-2 mb-lg-" id="btn-updatecart"><strong class="small">CONTINUE
@@ -80,18 +80,17 @@
                         <p class="mb-4 fs-4 fw-bold"><strong>Cart Total</strong></p>
                         <div class="d-flex justify-content-between fw-bold fs-5">
                             <p>Subtotal</p>
-                            <p class="text-danger">488$</p>
+                            <p class="text-danger">$ {{ totalCart }}</p>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold fs-5">
                             <p>Total</p>
-                            <p class="text-danger">488$</p>
+                            <p class="text-danger">$ {{ totalCart }}</p>
                         </div>
                         <b-button class="mt-4 w-100 py-2 fw-bold small " id="btn-tocheckout">PROCEED TO CHECKOUT
                         </b-button>
                     </div>
                 </b-col>
-
 
             </b-row>
 
@@ -101,7 +100,10 @@
 
 <script>
     import breadCrumb from "@/components/BreadCrumb.vue"
-    import axios from "axios";
+    import {
+        mapState,
+        mapActions
+    } from "vuex";
 
     export default {
         name: 'ShopingCart',
@@ -110,88 +112,70 @@
         },
         data() {
             return {
-                items: [{
-                        Product: {
-                            img: require('@/assets/img/product/product-1.jpg'),
-                            name: 'Vegetable’s Package'
-                        },
-                        Price: 10,
-                        Quantity: 2,
-                        Total: 582,
-                        delete: 'x-circle'
-                    },
-                    {
-                        Product: {
-                            img: require('@/assets/img/product/product-2.jpg'),
-                            name: 'Vegetable’s Package'
-                        },
-                        Price: 26,
-                        Quantity: 3,
-                        Total: 582,
-                        delete: 'x-circle'
-                    },
-                    {
-                        Product: {
-                            img: require('@/assets/img/product/product-3.jpg'),
-                            name: 'Vegetable’s Package'
-                        },
-                        Price: 38,
-                        Quantity: 5,
-                        Total: 582,
-                        delete: 'x-circle'
-                    },
-                    {
-                        Product: {
-                            img: require('@/assets/img/product/product-4.jpg'),
-                            name: 'Vegetable’s Package'
-                        },
-                        Price: 15,
-                        Quantity: 7,
-                        Total: 582,
-                        delete: 'x-circle'
-                    }
-                ],
                 currentPage: 1,
                 perPage: 5,
-                cartUser: [],
+
             }
         },
         computed: {
+
+            ...mapState('cart', {
+                cartUser: state => state.cart  
+            }),
+
+            items() {
+                if(!this.cartUser || !this.cartUser.items  ){
+                    return []
+                }
+              return  this.cartUser.items
+                    .map(item => {
+                        return {
+                            Product: {
+                                img: item.product.imgs[0],
+                                name: item.product.name,
+                            },
+                            Price: 
+                            item.product.promotion.priceAfter > 0 ? 
+                                item.product.promotion.priceAfter : 
+                                item.product.price,
+                            Quantity: [item.quantity, item.product.quantity],
+                            Total: (item.product.promotion.priceAfter > 0 ?
+                                item.product.promotion.priceAfter : 
+                                item.product.price) * item.quantity,
+                            delete: 'x-circle',
+                            id: item._id,
+
+                        }
+                    })
+            },
+
+            totalCart() {
+                return this.items.reduce((accu, item) => accu + item.Total, 0)
+            },
+
+
             rows() {
                 return this.items.length
-            }
+            },
+
         },
 
         methods: {
-            async getCartUser() {
-                try {
-                    const token = localStorage.getItem('tokenCustomer')
-                    const response = await axios.get(
-                        `http://localhost:3000/api/cart/getCart/${this.$route.params.storeName}`, {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            }
-                        })
-                    this.cartUser = response.data.cart.items
-                        .map(item => {
-                            return {
-                                Product: {
-                                    img: item.product.imgs[0],
-                                    name: item.product.name
-                                },
-                                Price: item.product.promotion.priceAfter > 0 ? item.product.promotion
-                                    .priceAfter : item.product.price,
-                                Quantity: item.quantity,
-                                Total: (item.product.promotion.priceAfter > 0 ? item.product.promotion.priceAfter : item.product.price) * item.quantity  ,
-                                delete: 'x-circle',
-                                id: item._id
-                            }
-                        })
 
-                } catch (error) {
-                    console.log(`error get cart use is :${error}`)
-                }
-            },
+            // GET CART USER
+            ...mapActions('cart', {
+                getCartUser: 'ac_getCart'
+            }),
+
+            ...mapActions('cart', {
+                updateQuantityItem: 'ac_updateQuntityItem'
+            }),
+
+            onQuantityChange(idItem,newQuantity){
+                this.updateQuantityItem({id:idItem,newQuantity})
+           
+            }
+
         },
 
         mounted() {
