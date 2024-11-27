@@ -18,7 +18,11 @@ const mutations = {
     },
 
     m_updateQuntityItem(state, {id,newQuantity} ) {
-        const updateItems = state.cart.items.map(ele => ele._id === itemUpdate._id ? itemUpdate : ele)
+        const updateItems = state.cart.items.map(ele=>
+            ele._id===id
+            ? {...ele,quantity:newQuantity}
+            :ele
+        )
         state.cart.items = updateItems
     },
 
@@ -93,20 +97,17 @@ const actions = {
         id,
         newQuantity
     }) {
-        try {
-            const cartId = localStorage.getItem('cartUser')
-            const token = localStorage.getItem('tokenCustomer')
-            const response = await axios.put(`http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
-                newQuantity
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-            commit('m_updateQuntityItem', {id,newQuantity} )
-        } catch (error) {
-            console.log(`the error update item is : $${error} `)
-        }
+        const cartId = localStorage.getItem('cartUser')
+        const token = localStorage.getItem('tokenCustomer')
+        const response = await axios.put(`http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
+            newQuantity
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        })
+        commit('m_updateQuntityItem', {id,newQuantity} )
+        return response
     },
 
     async ac_deleteItem({

@@ -4,14 +4,8 @@
             <breadCrumb :titlebreadcrumb="'Shopping cart'" />
         </div>
         <!-- alert -->
-        <b-alert 
-            id="alert" 
-            class="position-absolute bottom-0 d-flex align-items-center gap-3" 
-            :show="dismissCountDown"
-            dismissible 
-            :variant="alertType" 
-            @dismissed="dismissCountDown=0" 
-            @dismiss-count-down="dismissSecs">
+        <b-alert id="alert" class="position-absolute bottom-0 d-flex align-items-center gap-3" :show="dismissCountDown"
+            dismissible :variant="alertType" @dismissed="dismissCountDown=0" @dismiss-count-down="dismissSecs">
             <p class="mb-0"><strong>{{ alertMessage }}</strong></p>
         </b-alert>
         <!-- alert -->
@@ -219,25 +213,36 @@
                     const confirme = confirm('Are you sure you want to delete this item ?')
                     if (confirme) {
                         await this.$store.dispatch('cart/ac_deleteItem', itemId)
-                        this.alertMessage='Item in deleted with success'
-                        this.alertType='success'
+                        this.alertMessage = 'Item in deleted with success'
+                        this.alertType = 'success'
                         this.dismissCountDown = this.dismissSecs
                     }
                 } catch (error) {
-                    this.alertMessage='A problem has occurred on the server. Please try again later.'
-                    this.alertType='danger'
+                    this.alertMessage = 'A problem has occurred on the server. Please try again later.'
+                    this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
                 }
 
             },
 
-            onQuantityChange(idItem, newQuantity) {
-                this.$store.dispatch('cart/ac_updateQuntityItem', {
-                    id: idItem,
-                    newQuantity
-                })
+            async onQuantityChange(idItem, newQuantity) {
+                try {
+                    const response = await this.$store.dispatch('cart/ac_updateQuntityItem', {
+                        id: idItem,
+                        newQuantity
+                    })
+
+                    this.alertMessage=response.data.message
+                    this.alertType = 'success'
+                    this.dismissCountDown = this.dismissSecs
+                }
+                catch(error){
+                    this.alertMessage = 'A problem has occurred on the server. Please try again later.'
+                    this.alertType = 'danger'
+                    this.dismissCountDown = this.dismissSecs
+                }
             }
-            
+
         },
 
         mounted() {
@@ -299,9 +304,9 @@
         /* Rendre la ligne moins visible */
     }
 
-     /* alert */
+    /* alert */
 
-     .alert .close {
+    .alert .close {
         height: 24px;
         width: 24px;
         display: flex;
