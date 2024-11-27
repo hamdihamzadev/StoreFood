@@ -255,19 +255,16 @@
 
             },
 
-            async getProduct() {
-                try {
-                    const nameStore = this.$route.params.storeName
-                    const id = this.$route.params.id
-                    const response = await axios.get(
-                        `http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
-                    this.myProduct = response.data.product
-                    this.imgSelected = this.myProduct.imgs[0]
-                    this.idCategoryFeaturedProduct = response.data.product.category
-                    await this.getProductsCategory()
-
-                } catch (error) {
-                    console.log('error get product in page product is :', error)
+            async getProduct(){
+                try{
+                    const nameStore=this.$route.params.storeName
+                    const id=this.$route.params.id
+                    const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
+                    this.myProduct=response.data.product
+                 
+                }
+                catch(error){
+                    console.log('error get product in page product is :',error)
                 }
             },
 
@@ -365,7 +362,8 @@
             this.getProduct()
 
         },
-    };
+    }
+    
 </script>
 
 <style scoped>
