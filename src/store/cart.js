@@ -14,11 +14,16 @@ const mutations = {
 
     m_getCart(state, cart) {
         state.cart = cart
-       
+
     },
 
-    m_updateItem(state, itemUpdate) {
+    m_updateQuntityItem(state, {id,newQuantity} ) {
         const updateItems = state.cart.items.map(ele => ele._id === itemUpdate._id ? itemUpdate : ele)
+        state.cart.items = updateItems
+    },
+
+    deleteItem(state,itemId){
+        const updateItems = state.cart.items.filter(ele => ele._id !== itemId )
         state.cart.items = updateItems
     }
 }
@@ -30,36 +35,36 @@ const actions = {
     }) {
         try {
             const token = localStorage.getItem('tokenCustomer')
-            const response = await axios.post(`http://localhost:3000/api/cart/newCart`,{ nameStore: window.location.pathname.split('/')[1] },
-             {
+            const response = await axios.post(`http://localhost:3000/api/cart/newCart`, {
+                nameStore: window.location.pathname.split('/')[1]
+            }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             })
             const newCart = response.data.cart
-            commit('m_createCart',newCart)
+            commit('m_createCart', newCart)
 
         } catch (error) {
             console.log('error create cart is :', error)
         }
     },
 
-    async ac_addItem({commit},formItem){
-        try{
-            const token=localStorage.getItem('tokenCustomer')
-            const cartId = localStorage.getItem('cartUser')
-            const response=await axios.post(`http://localhost:3000/api/cart/addItem/${cartId}`,formItem,{
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            const cart = response.data.updateCart
-            commit('m_getCart', cart )
+    async ac_addItem({
+        commit
+    }, formItem) {
 
-        }
-        catch(error){
-            console.log(`the error in add item to cart is : ${error}`)
-        }
+        const token = localStorage.getItem('tokenCustomer')
+        const cartId = localStorage.getItem('cartUser')
+        const response = await axios.post(`http://localhost:3000/api/cart/addItem/${cartId}`, formItem, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        const cart = response.data.updateCart
+        commit('m_getCart', cart)
+
+        return response
     },
 
     async ac_getCart({
@@ -74,7 +79,7 @@ const actions = {
                     }
                 })
             const newCart = response.data.cart
-            commit('m_getCart', newCart)
+            commit('m_getCart', newCart )
             localStorage.setItem('cartUser', response.data.cart._id)
 
         } catch (error) {
@@ -98,35 +103,25 @@ const actions = {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            const cart = response.data.cartUpdate
-            console.log(`this is update cart ==> ${
-              JSON.stringify(cart)
-            }`)
-            commit('m_getCart', cart)
+            commit('m_updateQuntityItem', {id,newQuantity} )
         } catch (error) {
             console.log(`the error update item is : $${error} `)
         }
     },
 
-
     async ac_deleteItem({
         commit
-    }, id) {
-        try {
-            const cartId = localStorage.getItem('cartUser')
-            const token = localStorage.getItem('tokenCustomer')
-            const response = await axios.put(`http://localhost:3000/api/cart/DeleteItem/:${cartId}/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-            const itemUpdate = response.data.itemDeleted
-            commit('m_deleteItem', itemUpdate)
-        } catch (error) {
-            console.log(`error delete item is ${error}`)
-        }
+    }, itemId) {
+        const cartId = localStorage.getItem('cartUser')
+        const token = localStorage.getItem('tokenCustomer')
+        const response= await axios.put(`http://localhost:3000/api/cart/DeleteItem/${cartId}/${itemId}`, {} , {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        commit('deleteItem', itemId)
+        return response
     }
-
 }
 
 export default {

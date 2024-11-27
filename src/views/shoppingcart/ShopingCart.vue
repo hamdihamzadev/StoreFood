@@ -3,23 +3,50 @@
         <div class="mb-5">
             <breadCrumb :titlebreadcrumb="'Shopping cart'" />
         </div>
+        <!-- alert -->
+        <b-alert 
+            id="alert" 
+            class="position-absolute bottom-0 d-flex align-items-center gap-3" 
+            :show="dismissCountDown"
+            dismissible 
+            :variant="alertType" 
+            @dismissed="dismissCountDown=0" 
+            @dismiss-count-down="dismissSecs">
+            <p class="mb-0"><strong>{{ alertMessage }}</strong></p>
+        </b-alert>
+        <!-- alert -->
         <b-container class="px-lg-5 ">
             <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
                 responsive>
                 <template #cell(Product)="data">
-                    <div class="d-flex gap-3 align-items-center">
+                    <div class="d-flex gap-3 align-items-center ">
                         <b-img id="img-product" :src="data.item.Product.img"></b-img>
-                        <p class="fs-6 fw-normal">{{ data.item.Product.name }}</p>
+                        <div class="d-flex flex-column  justify-content-center">
+                            <span> {{ data.item.Product.name }}</span>
+                            <span>Stock : <span class="text-success">{{ data.value.stock }}</span> </span>
+                            <span v-if=" data.value.stock===0">Stock out</span>
+                            <span v-else-if=" data.value.delete===true || data.value.visibility===false ">Product not
+                                dispo</span>
+                        </div>
                     </div>
                 </template>
                 <template #cell(Quantity)="data">
 
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
-                        <b-form-spinbutton class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]"
-                            min="1" :max="data.value[1]" @change="onQuantityChange(data.item.id , data.value[0])">
+                        <b-form-spinbutton
+                            :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
+                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1"
+                            :max="data.value[1]" @change="onQuantityChange(data.item.id , data.value[0])">
                         </b-form-spinbutton>
                     </div>
 
+                </template>
+                <!-- Colonne isActive -->
+                <template #cell(isActive)="data">
+                    <div class="text-center">
+                        <b-badge v-if="data.value" variant="success">Active</b-badge>
+                        <b-badge v-else variant="secondary">Inactive</b-badge>
+                    </div>
                 </template>
 
                 <template #head(delete)>
@@ -28,7 +55,7 @@
 
                 <template #cell(delete)="data">
 
-                    <b-dropdown-item-button>
+                    <b-dropdown-item-button @click="deleteItem(data.item.id)">
                         <b-icon :icon="data.item.delete" aria-hidden="true"></b-icon>
                     </b-dropdown-item-button>
 
@@ -45,7 +72,7 @@
 
             </b-table>
             <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
-            </b-pagination> 
+            </b-pagination>
 
             <b-row class="mt-5">
                 <b-col cols="12" lg="6">
@@ -115,32 +142,43 @@
                 currentPage: 1,
                 perPage: 5,
 
+                // alert
+                dismissCountDown: 0,
+                dismissSecs: 2,
+                alertType: '',
+                alertMessage: ''
+
             }
         },
         computed: {
 
             ...mapState('cart', {
-                cartUser: state => state.cart  
+                cartUser: state => state.cart
             }),
 
             items() {
-                if(!this.cartUser || !this.cartUser.items  ){
+                if (!this.cartUser || !this.cartUser.items) {
                     return []
                 }
-              return  this.cartUser.items
+                return this.cartUser.items
+                    .filter(ele => ele.delete === false)
                     .map(item => {
                         return {
+                            _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product
+                                .visibility === false ? 'active' : '',
                             Product: {
                                 img: item.product.imgs[0],
                                 name: item.product.name,
+                                stock: item.product.quantity,
+                                delete: item.product.delete,
+                                visibility: item.product.visibility,
+                                deleteitem: item.delete,
                             },
-                            Price: 
-                            item.product.promotion.priceAfter > 0 ? 
-                                item.product.promotion.priceAfter : 
-                                item.product.price,
+                            Price: item.product.promotion.priceAfter > 0 ?
+                                item.product.promotion.priceAfter : item.product.price,
                             Quantity: [item.quantity, item.product.quantity],
                             Total: (item.product.promotion.priceAfter > 0 ?
-                                item.product.promotion.priceAfter : 
+                                item.product.promotion.priceAfter :
                                 item.product.price) * item.quantity,
                             delete: 'x-circle',
                             id: item._id,
@@ -167,15 +205,39 @@
                 getCartUser: 'ac_getCart'
             }),
 
-            ...mapActions('cart', {
-                updateQuantityItem: 'ac_updateQuntityItem'
-            }),
+            getRowClass(item) {
+                console.log('this is', item)
+                if (item.stock === 0 || item.delete || !item.visibility) {
+                    return "disabled-row";
+                }
+                return "disabled-row";
+            },
 
-            onQuantityChange(idItem,newQuantity){
-                this.updateQuantityItem({id:idItem,newQuantity})
-           
+
+            async deleteItem(itemId) {
+                try {
+                    const confirme = confirm('Are you sure you want to delete this item ?')
+                    if (confirme) {
+                        await this.$store.dispatch('cart/ac_deleteItem', itemId)
+                        this.alertMessage='Item in deleted with success'
+                        this.alertType='success'
+                        this.dismissCountDown = this.dismissSecs
+                    }
+                } catch (error) {
+                    this.alertMessage='A problem has occurred on the server. Please try again later.'
+                    this.alertType='danger'
+                    this.dismissCountDown = this.dismissSecs
+                }
+
+            },
+
+            onQuantityChange(idItem, newQuantity) {
+                this.$store.dispatch('cart/ac_updateQuntityItem', {
+                    id: idItem,
+                    newQuantity
+                })
             }
-
+            
         },
 
         mounted() {
@@ -220,5 +282,54 @@
     #input-coupon:focus {
         box-shadow: none;
         border-color: inherit;
+    }
+
+    .bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    .disabled-row {
+        pointer-events: none;
+        /* Désactiver les interactions */
+        opacity: 0.6;
+        /* Rendre la ligne moins visible */
+    }
+
+     /* alert */
+
+     .alert .close {
+        height: 24px;
+        width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #a6a4a4;
+        border-radius: 4px;
+    }
+
+    #alert {
+        right: 20px;
+    }
+
+
+    v::deep #__BVID__84 {
+        background-color: #313131;
+    }
+
+    .fullscreen-spinner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
     }
 </style>

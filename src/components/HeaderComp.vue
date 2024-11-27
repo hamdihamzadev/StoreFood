@@ -174,7 +174,7 @@
                             </router-link>
                             <router-link :to="`/${$route.params.storeName}/Shopingcart`">
                                 <b-avatar icon="cart3" badge-variant="danger" variant="primary" 
-                                :badge="cartUser.items && cartUser.items.length ? cartUser.items.length : 0">
+                                :badge="itemsCart">
                                 </b-avatar>
                             </router-link>
               
@@ -256,9 +256,19 @@ import { mapActions, mapState } from 'vuex';
 
 
         computed:{
+
             ...mapState('cart', {
                 cartUser: state => state.cart
             }),
+
+            itemsCart(){
+                if(!this.cartUser || !this.cartUser.items ){
+                    return []
+                }
+                return this.cartUser.items
+                .filter(ele=>ele.delete===false).length
+            }
+            
         },
 
 

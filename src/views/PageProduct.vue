@@ -4,6 +4,11 @@
             <breadCrumb :titlebreadcrumb="PageProduct" />
         </div>
         <b-container>
+            <b-alert id="alert" class="position-absolute bottom-0 d-flex align-items-center gap-3"
+                :show="dismissCountDown" dismissible :variant="errorType" @dismissed="dismissCountDown=0"
+                @dismiss-count-down="dismissSecs">
+                <p class="mb-0"><strong>{{ errorMessage }}</strong></p>
+            </b-alert>
             <b-row>
                 <b-col lg="6">
                     <div class="position-relative">
@@ -61,7 +66,8 @@
                                 </b-form-spinbutton>
                             </b-col>
                             <b-col lg="9" style="height: 50px;">
-                                <b-button @click="addToCart()" :disabled="myProduct.quantity===0" id="btn-addPrd"
+                                
+                                <b-button :disabled="myProduct.quantity===0" @click="addToCart()" id="btn-addPrd"
                                     class="h-100 w-100 d-flex align-items-center justify-content-center gap-3">
                                     <b-icon icon="cart-plus" aria-hidden="true"></b-icon>
                                     <strong>ADD TO CART</strong>
@@ -97,6 +103,8 @@
                     </div>
                 </b-col>
             </b-row>
+
+            <p>{{myProduct}}</p>
 
             <!-- descption product --->
 
@@ -142,20 +150,22 @@
                 <ProductItem :products="FeaturedProduct" />
             </div>
 
+
+
             <!-- modal connecte to account for shopping -->
             <b-modal id="modal-connecte" title="BootstrapVue" hide-header hide-footer>
                 <h3><strong>Login required </strong></h3>
-                <p class="mb-4" >To purchase this product, you must be logged into your account. <br > 
+                <p class="mb-4">To purchase this product, you must be logged into your account. <br>
                     Please log in or create an account to proceed with your purchase
                 </p>
-                
-             
+
+
                 <div>
-                    <router-link :to="`/${$route.params.storeName}/Login`" >
-                        <b-button  id="btn-logInModal" class="me-2 px-4" >Log in</b-button>
+                    <router-link :to="`/${$route.params.storeName}/Login`">
+                        <b-button id="btn-logInModal" class="me-2 px-4">Log in</b-button>
                     </router-link>
                     <router-link :to="`/${$route.params.storeName}/Signup`">
-                        <b-button  id="btn-SignupModal" class="px-4" >Sign up</b-button>
+                        <b-button id="btn-SignupModal" class="px-4">Sign up</b-button>
                     </router-link>
                 </div>
             </b-modal>
@@ -169,7 +179,9 @@
     import VueSlickCarousel from 'vue-slick-carousel'
     import ProductItem from '../components/ProductItem.vue'
     import axios from 'axios';
-import { mapActions } from 'vuex';
+    import {
+        mapActions
+    } from 'vuex';
 
     export default {
         name: 'PageProduct',
@@ -216,7 +228,12 @@ import { mapActions } from 'vuex';
                 myProduct: {},
                 FeaturedProduct: [],
                 idCategoryFeaturedProduct: '',
-                
+
+                // alert
+                dismissCountDown: 0,
+                dismissSecs: 2,
+                errorType: '',
+                errorMessage: ''
 
             };
         },
@@ -227,15 +244,15 @@ import { mapActions } from 'vuex';
             },
 
             likeProduct() {
-                const tokenUser=localStorage.getItem('tokenuser')
-                if(!tokenUser){
+                const tokenUser = localStorage.getItem('tokenuser')
+                if (!tokenUser) {
                     this.showModalConnect()
-                }else{
+                } else {
                     this.activeLike = !this.activeLike
                     this.showBottom = true
                 }
 
-                
+
             },
 
             async getProduct() {
@@ -267,32 +284,68 @@ import { mapActions } from 'vuex';
                 }
             },
 
-            showModalConnect(){
+            showModalConnect() {
                 this.$bvModal.show('modal-connecte')
             },
 
             addToCart() {
-                const tokenUser=localStorage.getItem('tokenCustomer')
-                if(tokenUser){
+                const tokenUser = localStorage.getItem('tokenCustomer')
+                if (tokenUser) {
                     this.addItemToCart()
-                }else{
+                } else {
                     this.showModalConnect()
                 }
-      
+
             },
 
             // ADD ITEM TO CART
-             addItemToCart(){
-                const formItem={
-                    product:this.$route.params.id,
-                    quantity:this.ValueQuantity,
+            async addItemToCart() {
+                const formItem = {
+                        product: this.$route.params.id,
+                        quantity: this.ValueQuantity,
+                    }
+                    
+                try {
+                    const response=await this.addItemToCartAction(formItem)
+                    this.errorMessage = response.data.message 
+                    this.errorType = 'success'
+                    this.dismissCountDown = this.dismissSecs
+                    
+
+                } catch (error) {
+
+                    if (error.response ?.data ?.message) {
+                        let typeerror = error.response.data.message
+                        if (typeerror === 'The product is no longer available in the store') {
+                            this.errorMessage = typeerror
+                            this.errorType = 'danger'
+                            this.dismissCountDown = this.dismissSecs
+
+                        } else if (typeerror === 'stock out') {
+                            this.errorMessage = typeerror
+                            this.errorType = 'warning'
+                            this.dismissCountDown = this.dismissSecs
+
+                        } else if (typeerror.startsWith('Only')) {
+                            this.errorMessage = typeerror
+                            this.errorType = 'info'
+                            this.dismissCountDown = this.dismissSecs
+                            
+                        }
+
+                    } else {
+                        this.errorMessage = 'A problem has occurred on the server. Please try again later.'
+                        this.errorType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+
+                    }
+                   
                 }
-                this.addItemToCartAction(formItem)
             },
 
             // ADD ITEM TO CART
-            ...mapActions('cart',{
-                addItemToCartAction:'ac_addItem'
+            ...mapActions('cart', {
+                addItemToCartAction: 'ac_addItem'
             }),
 
 
@@ -443,15 +496,49 @@ import { mapActions } from 'vuex';
 
 
     /* modal connect  */
-    #btn-logInModal{
+    #btn-logInModal {
         background-color: var(--thirday-color)
     }
 
-    #btn-SignupModal{
+    #btn-SignupModal {
         border-color: var(--thirday-color);
         background-color: transparent;
         color: var(--thirday-color);
         font-weight: 600;
 
+    }
+
+    /* alert */
+
+    .alert .close {
+        height: 24px;
+        width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #a6a4a4;
+        border-radius: 4px;
+    }
+
+    #alert {
+        right: 20px;
+    }
+
+
+    v::deep #__BVID__84 {
+        background-color: #313131;
+    }
+
+    .fullscreen-spinner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
     }
 </style>
