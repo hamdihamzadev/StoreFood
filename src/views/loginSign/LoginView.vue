@@ -50,6 +50,8 @@
                     </div>
                 </b-col>
             </b-row>
+
+            <p>{{items}}</p>
         </b-container>
     </section>
 </template>
@@ -57,8 +59,11 @@
 
 <script>
     import axios from 'axios';
-    import { mapActions } from 'vuex';
-    
+    import {
+        mapActions,
+        mapState
+    } from 'vuex';
+
     export default {
         name: 'LoginView',
         data() {
@@ -81,7 +86,15 @@
         },
 
 
+        computed: {
+            ...mapState('cart', {
+                items: state => state.items
+            })
+        },
+
+
         methods: {
+
             async loginAccount() {
                 try {
 
@@ -94,7 +107,8 @@
                             localStorage.setItem('tokenCustomer', response.data.token)
 
                             // CREATE CART CUSTOMER
-                            this.createCart()
+                             this.createCart()
+                            
 
                             const targetRoute = `/${this.$route.params.storeName}`;
                             if (this.$route.path !== targetRoute) {
@@ -124,11 +138,16 @@
                 createCart: 'ac_createCart'
             }),
 
+            // GET CART USER
+            ...mapActions('cart', {
+                getItems: 'ac_getItems'
+            }),
 
         },
 
         mounted() {
             this.formLogin.nameStore = this.$route.params.storeName
+            this.getItems()
         }
     }
 </script>

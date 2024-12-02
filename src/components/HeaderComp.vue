@@ -189,7 +189,7 @@
 
 <script>
     import axios from 'axios';
-import { mapActions, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
     export default {
         name: 'HeaderComp',
@@ -258,15 +258,14 @@ import { mapActions, mapState } from 'vuex';
         computed:{
 
             ...mapState('cart', {
-                cartUser: state => state.cart
+                itemsStore: state => state.items
             }),
 
             itemsCart(){
-                if(!this.cartUser || !this.cartUser.items ){
+                if(!this.itemsStore || !this.itemsStore ){
                     return []
                 }
-                return this.cartUser.items
-                .filter(ele=>ele.delete===false).length
+                return this.itemsStore.length
             }
             
         },
@@ -322,21 +321,13 @@ import { mapActions, mapState } from 'vuex';
                 window.location.reload()
             },
 
-
-            // GET CART USER
-            ...mapActions('cart',{
-                getCartUser:'ac_getCart'
-            })
-
         },
 
         mounted() {
             this.toggleActiveMounted()
             this.getUserConnected()
             this.isTokenAvailable()
-            this.getCartUser()
-            console.log(this.cartUser)
-
+            this.$store.dispatch('cart/ac_getItems')
 
         }
     }

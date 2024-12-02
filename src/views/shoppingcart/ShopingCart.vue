@@ -3,21 +3,27 @@
         <div class="mb-5">
             <breadCrumb :titlebreadcrumb="'Shopping cart'" />
         </div>
+
         <!-- alert -->
         <b-alert id="alert" class="position-absolute bottom-0 d-flex align-items-center gap-3" :show="dismissCountDown"
             dismissible :variant="alertType" @dismissed="dismissCountDown=0" @dismiss-count-down="dismissSecs">
             <p class="mb-0"><strong>{{ alertMessage }}</strong></p>
         </b-alert>
+        <b-spinner type="grow" label="Loading..." v-show="showSpinner"></b-spinner>
         <!-- alert -->
         <b-container class="px-lg-5 ">
-            <b-table small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
+            <b-table v-show="showskeletonTable===false"  small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
                 responsive>
                 <template #cell(Product)="data">
                     <div class="d-flex gap-3 align-items-center ">
                         <b-img id="img-product" :src="data.item.Product.img"></b-img>
                         <div class="d-flex flex-column  justify-content-center">
                             <span> {{ data.item.Product.name }}</span>
-                            <span>Stock : <span class="text-success">{{ data.value.stock }}</span> </span>
+                            <span>Stock :
+                                <span class="text-success">{{ data.value.stock }}</span>
+                                <span v-if="data.value.stock<data.item.Quantity[0]" class="text-danger">Reduce the
+                                    quantity to {{ data.value.stock }}.</span>
+                            </span>
                             <span v-if=" data.value.stock===0">Stock out</span>
                             <span v-else-if=" data.value.delete===true || data.value.visibility===false ">Product not
                                 dispo</span>
@@ -29,8 +35,8 @@
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
                         <b-form-spinbutton
                             :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
-                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1"
-                            :max="data.value[1]" @change="onQuantityChange(data.item.id , data.value[0])">
+                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1" 
+                            @change="onQuantityChange(data.item.id,data.value[0])">
                         </b-form-spinbutton>
                     </div>
 
@@ -65,7 +71,15 @@
 
 
             </b-table>
-            <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
+
+            <b-skeleton-table
+                v-show="showskeletonTable"
+                :rows="5"
+                :columns="4"
+                :table-props="{ bordered: true, striped: true }">
+            </b-skeleton-table>
+
+            <b-pagination    v-if="!showskeletonTable || items.length > 0"  v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
             </b-pagination>
 
             <b-row class="mt-5">
@@ -121,9 +135,10 @@
 
 <script>
     import breadCrumb from "@/components/BreadCrumb.vue"
+    import axios from "axios";
+
     import {
         mapState,
-        mapActions
     } from "vuex";
 
     export default {
@@ -140,22 +155,25 @@
                 dismissCountDown: 0,
                 dismissSecs: 2,
                 alertType: '',
-                alertMessage: ''
+                alertMessage: '',
+
+                showSpinner: false,
+                items: [],
+                showskeletonTable:false
 
             }
         },
         computed: {
 
             ...mapState('cart', {
-                cartUser: state => state.cart
+                itemsrr: state => state.items
             }),
 
-            items() {
-                if (!this.cartUser || !this.cartUser.items) {
+            itemsInTable() {
+                if (!this.items) {
                     return []
                 }
-                return this.cartUser.items
-                    .filter(ele => ele.delete === false)
+                return this.items
                     .map(item => {
                         return {
                             _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product
@@ -185,7 +203,6 @@
                 return this.items.reduce((accu, item) => accu + item.Total, 0)
             },
 
-
             rows() {
                 return this.items.length
             },
@@ -194,60 +211,210 @@
 
         methods: {
 
-            // GET CART USER
-            ...mapActions('cart', {
-                getCartUser: 'ac_getCart'
-            }),
-
-            getRowClass(item) {
-                console.log('this is', item)
-                if (item.stock === 0 || item.delete || !item.visibility) {
-                    return "disabled-row";
-                }
-                return "disabled-row";
-            },
-
-
             async deleteItem(itemId) {
+                this.showskeletonTable=true
                 try {
                     const confirme = confirm('Are you sure you want to delete this item ?')
                     if (confirme) {
-                        await this.$store.dispatch('cart/ac_deleteItem', itemId)
-                        this.alertMessage = 'Item in deleted with success'
+                        await this.$store.dispatch('cart/ac_deleteItem',itemId)
+                        this.alertMessage = 'Item is deleted with success'
                         this.alertType = 'success'
                         this.dismissCountDown = this.dismissSecs
+                        this.showskeletonTable=false
                     }
                 } catch (error) {
                     this.alertMessage = 'A problem has occurred on the server. Please try again later.'
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
+                    this.showskeletonTable=false
                 }
-
             },
 
-            async onQuantityChange(idItem, newQuantity) {
+            async onQuantityChange(id, newQuantity) {
+                this.showskeletonTable=true
                 try {
-                    const response = await this.$store.dispatch('cart/ac_updateQuntityItem', {
-                        id: idItem,
-                        newQuantity
-                    })
-
-                    this.alertMessage=response.data.message
+                    const cartId = localStorage.getItem('cartUser')
+                    const token = localStorage.getItem('tokenCustomer')
+                    const response = await axios.put(
+                        `http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
+                            newQuantity
+                        }, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            }
+                        })
+                    
+                    this.items = response.data.cartUpdate.items.filter(ele => ele.delete === false)
+                        .map(item => {
+                            return {
+                                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item
+                                    .product
+                                    .visibility === false ? 'active' : '',
+                                Product: {
+                                    img: item.product.imgs[0],
+                                    name: item.product.name,
+                                    stock: item.product.quantity,
+                                    delete: item.product.delete,
+                                    visibility: item.product.visibility,
+                                    deleteitem: item.delete,
+                                },
+                                Price: item.product.promotion.priceAfter > 0 ?
+                                    item.product.promotion.priceAfter : item.product.price,
+                                Quantity: [item.quantity, item.product.quantity],
+                                Total: (item.product.promotion.priceAfter > 0 ?
+                                    item.product.promotion.priceAfter :
+                                    item.product.price) * item.quantity,
+                                delete: 'x-circle',
+                                id: item._id,
+                            }
+                        })
+                    this.showskeletonTable=false    
+                    this.alertMessage = response.data.message
                     this.alertType = 'success'
                     this.dismissCountDown = this.dismissSecs
-                }
-                catch(error){
+
+
+                } catch (error) {
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.alertMessage = error.response.data.message
+                        if (this.alertMessage === 'Stock out') {
+                            this.alertType = 'warning'
+                            this.dismissCountDown = this.dismissSecs
+                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
+                                .map(item => {
+                                    return {
+                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
+                                            true || item.product
+                                            .visibility === false ? 'active' : '',
+                                        Product: {
+                                            img: item.product.imgs[0],
+                                            name: item.product.name,
+                                            stock: item.product.quantity,
+                                            delete: item.product.delete,
+                                            visibility: item.product.visibility,
+                                            deleteitem: item.delete,
+                                        },
+                                        Price: item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter : item.product.price,
+                                        Quantity: [item.quantity, item.product.quantity],
+                                        Total: (item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter :
+                                            item.product.price) * item.quantity,
+                                        delete: 'x-circle',
+                                        id: item._id,
+                                    }
+                                })
+                                this.showskeletonTable=false 
+                        } else if (this.alertMessage === 'The product is no longer available in the store') {
+                            this.alertType = 'danger'
+                            this.dismissCountDown = this.dismissSecs
+                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
+                                .map(item => {
+                                    return {
+                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
+                                            true || item.product
+                                            .visibility === false ? 'active' : '',
+                                        Product: {
+                                            img: item.product.imgs[0],
+                                            name: item.product.name,
+                                            stock: item.product.quantity,
+                                            delete: item.product.delete,
+                                            visibility: item.product.visibility,
+                                            deleteitem: item.delete,
+                                        },
+                                        Price: item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter : item.product.price,
+                                        Quantity: [item.quantity, item.product.quantity],
+                                        Total: (item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter :
+                                            item.product.price) * item.quantity,
+                                        delete: 'x-circle',
+                                        id: item._id,
+                                    }
+                                })
+                                this.showskeletonTable=false 
+                        } else if (this.alertMessage.startsWith('Only')) {
+                            this.alertType = 'info'
+                            this.dismissCountDown = this.dismissSecs
+                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
+                                .map(item => {
+                                    return {
+                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
+                                            true || item.product
+                                            .visibility === false ? 'active' : '',
+                                        Product: {
+                                            img: item.product.imgs[0],
+                                            name: item.product.name,
+                                            stock: item.product.quantity,
+                                            delete: item.product.delete,
+                                            visibility: item.product.visibility,
+                                            deleteitem: item.delete,
+                                        },
+                                        Price: item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter : item.product.price,
+                                        Quantity: [item.quantity, item.product.quantity],
+                                        Total: (item.product.promotion.priceAfter > 0 ?
+                                            item.product.promotion.priceAfter :
+                                            item.product.price) * item.quantity,
+                                        delete: 'x-circle',
+                                        id: item._id,
+                                    }
+                                })
+                                this.showskeletonTable=false 
+                        }
+                    }
                     this.alertMessage = 'A problem has occurred on the server. Please try again later.'
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
+
+                }
+            },
+
+
+            async getItems() {
+                try {
+                    const token = localStorage.getItem('tokenCustomer')
+                    const response = await axios.get(
+                        `http://localhost:3000/api/cart/getCart/${window.location.pathname.split('/')[1] }`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            }
+                        })
+                    this.items = response.data.cart.items.filter(ele => ele.delete === false)
+                        .map(item => {
+                            return {
+                                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item
+                                    .product
+                                    .visibility === false ? 'active' : '',
+                                Product: {
+                                    img: item.product.imgs[0],
+                                    name: item.product.name,
+                                    stock: item.product.quantity,
+                                    delete: item.product.delete,
+                                    visibility: item.product.visibility,
+                                    deleteitem: item.delete,
+                                },
+                                Price: item.product.promotion.priceAfter > 0 ?
+                                    item.product.promotion.priceAfter : item.product.price,
+                                Quantity: [item.quantity, item.product.quantity],
+                                Total: (item.product.promotion.priceAfter > 0 ?
+                                    item.product.promotion.priceAfter :
+                                    item.product.price) * item.quantity,
+                                delete: 'x-circle',
+                                id: item._id,
+                            }
+                        })
+
+                } catch (error) {
+                    console.log(error)
                 }
             }
-
         },
 
         mounted() {
-            this.getCartUser()
+            this.getItems()
         }
+
     }
 </script>
 

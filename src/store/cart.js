@@ -1,8 +1,8 @@
 import axios from "axios";
-// const apiUrl=process.env.VUE_APP_API_URL
 
 const state = {
-    cart: {},
+    items: [],
+    cart:{}
 
 }
 
@@ -12,18 +12,8 @@ const mutations = {
         state.cart = newCart
     },
 
-    m_getCart(state, cart) {
-        state.cart = cart
-
-    },
-
-    m_updateQuntityItem(state, {id,newQuantity} ) {
-        const updateItems = state.cart.items.map(ele=>
-            ele._id===id
-            ? {...ele,quantity:newQuantity}
-            :ele
-        )
-        state.cart.items = updateItems
+    m_getItems(state,items) {
+        state.items=items
     },
 
     deleteItem(state,itemId){
@@ -47,6 +37,7 @@ const actions = {
                 }
             })
             const newCart = response.data.cart
+            console.log('cat is =========>', newCart)
             commit('m_createCart', newCart)
 
         } catch (error) {
@@ -71,7 +62,7 @@ const actions = {
         return response
     },
 
-    async ac_getCart({
+    async ac_getItems({
         commit
     }) {
         try {
@@ -82,8 +73,8 @@ const actions = {
                         Authorization: `Bearer ${token}`,
                     }
                 })
-            const newCart = response.data.cart
-            commit('m_getCart', newCart )
+            const items = response.data.cart.items.filter(ele=>ele.delete===false)
+            commit('m_getItems', items )
             localStorage.setItem('cartUser', response.data.cart._id)
 
         } catch (error) {
@@ -106,7 +97,8 @@ const actions = {
                 Authorization: `Bearer ${token}`,
             }
         })
-        commit('m_updateQuntityItem', {id,newQuantity} )
+        const items = response.data.cartUpdate.items
+        commit('m_getItems', items )
         return response
     },
 
@@ -120,7 +112,8 @@ const actions = {
                 Authorization: `Bearer ${token}`
             }
         })
-        commit('deleteItem', itemId)
+        const items = response.data.cartAfterDeleteItem.items.filter(ele=>ele.delete===false)
+        commit('m_getItems', items )
         return response
     }
 }

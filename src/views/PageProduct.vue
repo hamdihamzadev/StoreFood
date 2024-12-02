@@ -221,7 +221,7 @@
                     ],
                 },
                 ValueQuantity: 1,
-                imgSelected: require('@/assets/img/product/product-1.jpg'),
+                imgSelected: {},
                 activeLike: false,
                 showBottom: false,
 
@@ -261,6 +261,7 @@
                     const id=this.$route.params.id
                     const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
                     this.myProduct=response.data.product
+                    this.imgSelected=response.data.product.imgs[0]
                  
                 }
                 catch(error){
@@ -360,7 +361,6 @@
         mounted() {
             this.PageProduct = this.$route.path.slice(1);
             this.getProduct()
-
         },
     }
     
