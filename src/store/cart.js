@@ -75,13 +75,17 @@ const actions = {
                 }
             })
             const items = response.data.updateCart.items
-            commit('m_getItems', items)
-            return response.data.message
+            commit('m_getItems',items)
+            return  {messageSuccess:response.data.message}
         }
         catch(error){
-            return error
+            if(error.response && error.response.data && error.response.data.message){
+              return  {messageError:error.response.data.message}
+            }else{
+                return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
+            }
         }
-
+        
     },
 
     async ac_getItems({

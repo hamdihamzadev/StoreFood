@@ -133,7 +133,6 @@
 
 <script>
     import breadCrumb from "@/components/BreadCrumb.vue"
-    import axios from "axios";
 
     import {
         mapState,
@@ -207,70 +206,35 @@
 
 
             async onQuantityChange(id, newQuantity) {
-                this.showskeletonTable = true
-                try {
-                    const cartId = localStorage.getItem('cartUser')
-                    const token = localStorage.getItem('tokenCustomer')
-                    const response = await axios.put(
-                        `http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
-                            newQuantity
-                        }, {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            }
-                        })
 
-                    await this.createObjectItemInTable(response.data.cartUpdate.items) 
-                    this.showskeletonTable = false
-                    this.alertMessage = response.data.message
+                this.showskeletonTable = true
+                const response = await this.$store.dispatch('cart/ac_addItem',{id,newQuantity})
+
+                if(response.messageSuccess){
+                    this.alertMessage = response.messageSuccess
                     this.alertType = 'success'
                     this.dismissCountDown = this.dismissSecs
-
-
-                } catch (error) {
-                    if (error.response && error.response.data && error.response.data.message) {
-                        this.alertMessage = error.response.data.message
-                        if (this.alertMessage === 'Stock out') {
-
-                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
-                            this.alertType = 'warning'
-                            this.dismissCountDown = this.dismissSecs
-                            this.showskeletonTable = false
-
-                        } else if (this.alertMessage === 'The product is no longer available in the store') {
-
-                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
-                            this.alertType = 'danger'
-                            this.dismissCountDown = this.dismissSecs
-                            this.showskeletonTable = false
-
-                        } else if (this.alertMessage.startsWith('Only')) {
-
-                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
-                            this.alertType = 'info'
-                            this.dismissCountDown = this.dismissSecs
-                            this.showskeletonTable = false
-                        }
-                    }
-                    this.alertMessage = 'A problem has occurred on the server. Please try again later.'
+                }else if(response.messageError || response.messageErrorServe){
+                    this.alertMessage = response.messageError || response.messageErrorServe
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-                    this.showskeletonTable = false
-
                 }
+
+                this.showskeletonTable = false
+
             },
 
             async getItems(){
                 this.showskeletonTable = true
-               const response = await this.$store.dispatch('cart/ac_getItems')
-               if(response.messageError){
+                const response = await this.$store.dispatch('cart/ac_getItems')
+                if(response.messageError){
                     this.alertMessage = response.messageError
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-               }else if(response.messageSuccess){
+                }else if(response.messageSuccess){
                 this.showskeletonTable = false
                 
-               }
+                }
             }
         },
 

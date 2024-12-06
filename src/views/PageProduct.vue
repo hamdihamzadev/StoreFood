@@ -66,7 +66,7 @@
                                 </b-form-spinbutton>
                             </b-col>
                             <b-col lg="9" style="height: 50px;">
-                                
+
                                 <b-button :disabled="myProduct.quantity===0" @click="addToCart()" id="btn-addPrd"
                                     class="h-100 w-100 d-flex align-items-center justify-content-center gap-3">
                                     <b-icon icon="cart-plus" aria-hidden="true"></b-icon>
@@ -255,17 +255,17 @@
 
             },
 
-            async getProduct(){
-                try{
-                    const nameStore=this.$route.params.storeName
-                    const id=this.$route.params.id
-                    const response=await axios.get(`http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
-                    this.myProduct=response.data.product
-                    this.imgSelected=response.data.product.imgs[0]
-                 
-                }
-                catch(error){
-                    console.log('error get product in page product is :',error)
+            async getProduct() {
+                try {
+                    const nameStore = this.$route.params.storeName
+                    const id = this.$route.params.id
+                    const response = await axios.get(
+                        `http://localhost:3000/api/product/getOneProduct/${nameStore}/${id}`)
+                    this.myProduct = response.data.product
+                    this.imgSelected = response.data.product.imgs[0]
+
+                } catch (error) {
+                    console.log('error get product in page product is :', error)
                 }
             },
 
@@ -288,57 +288,36 @@
 
             addToCart() {
                 const tokenUser = localStorage.getItem('tokenCustomer')
-                if (tokenUser) {
-                    this.addItemToCart()
-                } else {
-                    this.showModalConnect()
-                }
+
 
             },
 
             // ADD ITEM TO CART
-            async addItemToCart() {
+            async addToCart() {
+
                 const formItem = {
-                        product: this.$route.params.id,
-                        quantity: this.ValueQuantity,
-                    }
-                    
-                try {
-                    const response=await this.addItemToCartAction(formItem)
-                    this.errorMessage = response.data.message 
-                    this.errorType = 'success'
-                    this.dismissCountDown = this.dismissSecs
-                    
-
-                } catch (error) {
-
-                    if (error.response ?.data ?.message) {
-                        let typeerror = error.response.data.message
-                        if (typeerror === 'The product is no longer available in the store') {
-                            this.errorMessage = typeerror
-                            this.errorType = 'danger'
-                            this.dismissCountDown = this.dismissSecs
-
-                        } else if (typeerror === 'stock out') {
-                            this.errorMessage = typeerror
-                            this.errorType = 'warning'
-                            this.dismissCountDown = this.dismissSecs
-
-                        } else if (typeerror.startsWith('Only')) {
-                            this.errorMessage = typeerror
-                            this.errorType = 'info'
-                            this.dismissCountDown = this.dismissSecs
-                            
-                        }
-
-                    } else {
-                        this.errorMessage = 'A problem has occurred on the server. Please try again later.'
-                        this.errorType = 'danger'
-                        this.dismissCountDown = this.dismissSecs
-
-                    }
-                   
+                    product: this.$route.params.id,
+                    quantity: this.ValueQuantity,
                 }
+                
+                const tokenUser = localStorage.getItem('tokenCustomer')
+                if (tokenUser) {
+                    const response = await this.$store.dispatch('cart/ac_addItem', formItem)
+
+                    if (response.messageSuccess) {
+                        this.alertMessage = response.messageSuccess
+                        this.alertType = 'success'
+                        this.dismissCountDown = this.dismissSecs
+                    } else if (response.messageError || response.messageErrorServe) {
+                        this.alertMessage = response.messageError || response.messageErrorServe
+                        this.alertType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+                    }
+
+                } else {
+                    this.showModalConnect()
+                }
+
             },
 
             // ADD ITEM TO CART
@@ -363,7 +342,6 @@
             this.getProduct()
         },
     }
-    
 </script>
 
 <style scoped>
