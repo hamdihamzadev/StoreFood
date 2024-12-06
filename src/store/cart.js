@@ -3,7 +3,6 @@ import axios from "axios";
 const state = {
     items: [],
     cart:{}
-
 }
 
 const mutations = {
@@ -14,12 +13,30 @@ const mutations = {
 
     m_getItems(state,items) {
         state.items=items
+        .filter(item=>item.delete===false)
+        .map(item => {
+            return {
+                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'active' : '',
+                Product: {
+                    img: item.product.imgs[0],
+                    name: item.product.name,
+                    stock: item.product.quantity,
+                    delete: item.product.delete,
+                    visibility: item.product.visibility,
+                    deleteitem: item.delete,
+                },
+                Price: item.product.promotion.priceAfter > 0 ?
+                    item.product.promotion.priceAfter : item.product.price,
+                Quantity: [item.quantity, item.product.quantity],
+                Total: (item.product.promotion.priceAfter > 0 ?
+                    item.product.promotion.priceAfter :
+                    item.product.price) * item.quantity,
+                delete: 'x-circle',
+                id: item._id,
+            }
+        })
     },
 
-    deleteItem(state,itemId){
-        const updateItems = state.cart.items.filter(ele => ele._id !== itemId )
-        state.cart.items = updateItems
-    }
 }
 
 const actions = {
@@ -49,17 +66,22 @@ const actions = {
         commit
     }, formItem) {
 
-        const token = localStorage.getItem('tokenCustomer')
-        const cartId = localStorage.getItem('cartUser')
-        const response = await axios.post(`http://localhost:3000/api/cart/addItem/${cartId}`, formItem, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        const cart = response.data.updateCart
-        commit('m_getCart', cart)
+        try{
+            const token = localStorage.getItem('tokenCustomer')
+            const cartId = localStorage.getItem('cartUser')
+            const response = await axios.post(`http://localhost:3000/api/cart/addItem/${cartId}`, formItem, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            const items = response.data.updateCart.items
+            commit('m_getItems', items)
+            return response.data.message
+        }
+        catch(error){
+            return error
+        }
 
-        return response
     },
 
     async ac_getItems({
@@ -73,12 +95,14 @@ const actions = {
                         Authorization: `Bearer ${token}`,
                     }
                 })
-            const items = response.data.cart.items.filter(ele=>ele.delete===false)
-            commit('m_getItems', items )
+            const items = response.data.cart.items
+            commit('m_getItems',items)
             localStorage.setItem('cartUser', response.data.cart._id)
+            return {messageSuccess:'items get with success'}
 
         } catch (error) {
-            console.log(`error get all categories is ${error}`)
+            return {messageError:'Error in the server try again'}
+            
         }
     },
 
@@ -112,8 +136,8 @@ const actions = {
                 Authorization: `Bearer ${token}`
             }
         })
-        const items = response.data.cartAfterDeleteItem.items.filter(ele=>ele.delete===false)
-        commit('m_getItems', items )
+        const items=response.data.cartAfterDeleteItem.items.filter(ele=>ele.delete===false)
+        commit('m_getItems',items)
         return response
     }
 }
@@ -124,3 +148,9 @@ export default {
     mutations,
     actions
 }
+
+
+/**
+ *  if delete item ===> if ok ==> applique methide action the store ==> if true ==> create object items in 
+ * 
+ */

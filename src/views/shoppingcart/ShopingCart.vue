@@ -12,8 +12,8 @@
         <b-spinner type="grow" label="Loading..." v-show="showSpinner"></b-spinner>
         <!-- alert -->
         <b-container class="px-lg-5 ">
-            <b-table v-show="showskeletonTable===false"  small :per-page="perPage" :current-page="currentPage" id="tableOrders" :items="items" hover
-                responsive>
+            <b-table v-show="showskeletonTable===false" small :per-page="perPage" :current-page="currentPage"
+                id="tableOrders" :items="itemsInTable" hover responsive>
                 <template #cell(Product)="data">
                     <div class="d-flex gap-3 align-items-center ">
                         <b-img id="img-product" :src="data.item.Product.img"></b-img>
@@ -35,7 +35,7 @@
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
                         <b-form-spinbutton
                             :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
-                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1" 
+                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1"
                             @change="onQuantityChange(data.item.id,data.value[0])">
                         </b-form-spinbutton>
                     </div>
@@ -72,14 +72,12 @@
 
             </b-table>
 
-            <b-skeleton-table
-                v-show="showskeletonTable"
-                :rows="5"
-                :columns="4"
+            <b-skeleton-table v-show="showskeletonTable" :rows="5" :columns="4"
                 :table-props="{ bordered: true, striped: true }">
             </b-skeleton-table>
 
-            <b-pagination    v-if="!showskeletonTable || items.length > 0"  v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="tableOrders">
+            <b-pagination v-if="!showskeletonTable || items.length > 0" v-model="currentPage" :total-rows="rows"
+                :per-page="perPage" aria-controls="tableOrders">
             </b-pagination>
 
             <b-row class="mt-5">
@@ -158,15 +156,15 @@
                 alertMessage: '',
 
                 showSpinner: false,
-                items: [],
-                showskeletonTable:false
+                showskeletonTable: false
 
             }
         },
+
         computed: {
 
             ...mapState('cart', {
-                itemsrr: state => state.items
+                items: state => state.items
             }),
 
             itemsInTable() {
@@ -174,29 +172,6 @@
                     return []
                 }
                 return this.items
-                    .map(item => {
-                        return {
-                            _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product
-                                .visibility === false ? 'active' : '',
-                            Product: {
-                                img: item.product.imgs[0],
-                                name: item.product.name,
-                                stock: item.product.quantity,
-                                delete: item.product.delete,
-                                visibility: item.product.visibility,
-                                deleteitem: item.delete,
-                            },
-                            Price: item.product.promotion.priceAfter > 0 ?
-                                item.product.promotion.priceAfter : item.product.price,
-                            Quantity: [item.quantity, item.product.quantity],
-                            Total: (item.product.promotion.priceAfter > 0 ?
-                                item.product.promotion.priceAfter :
-                                item.product.price) * item.quantity,
-                            delete: 'x-circle',
-                            id: item._id,
-
-                        }
-                    })
             },
 
             totalCart() {
@@ -212,26 +187,27 @@
         methods: {
 
             async deleteItem(itemId) {
-                this.showskeletonTable=true
+                this.showskeletonTable = true
                 try {
                     const confirme = confirm('Are you sure you want to delete this item ?')
                     if (confirme) {
-                        await this.$store.dispatch('cart/ac_deleteItem',itemId)
+                        await this.$store.dispatch('cart/ac_deleteItem', itemId)
                         this.alertMessage = 'Item is deleted with success'
                         this.alertType = 'success'
                         this.dismissCountDown = this.dismissSecs
-                        this.showskeletonTable=false
+                        this.showskeletonTable = false
                     }
                 } catch (error) {
                     this.alertMessage = 'A problem has occurred on the server. Please try again later.'
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-                    this.showskeletonTable=false
+                    this.showskeletonTable = false
                 }
             },
 
+
             async onQuantityChange(id, newQuantity) {
-                this.showskeletonTable=true
+                this.showskeletonTable = true
                 try {
                     const cartId = localStorage.getItem('cartUser')
                     const token = localStorage.getItem('tokenCustomer')
@@ -243,32 +219,9 @@
                                 Authorization: `Bearer ${token}`,
                             }
                         })
-                    
-                    this.items = response.data.cartUpdate.items.filter(ele => ele.delete === false)
-                        .map(item => {
-                            return {
-                                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item
-                                    .product
-                                    .visibility === false ? 'active' : '',
-                                Product: {
-                                    img: item.product.imgs[0],
-                                    name: item.product.name,
-                                    stock: item.product.quantity,
-                                    delete: item.product.delete,
-                                    visibility: item.product.visibility,
-                                    deleteitem: item.delete,
-                                },
-                                Price: item.product.promotion.priceAfter > 0 ?
-                                    item.product.promotion.priceAfter : item.product.price,
-                                Quantity: [item.quantity, item.product.quantity],
-                                Total: (item.product.promotion.priceAfter > 0 ?
-                                    item.product.promotion.priceAfter :
-                                    item.product.price) * item.quantity,
-                                delete: 'x-circle',
-                                id: item._id,
-                            }
-                        })
-                    this.showskeletonTable=false    
+
+                    await this.createObjectItemInTable(response.data.cartUpdate.items) 
+                    this.showskeletonTable = false
                     this.alertMessage = response.data.message
                     this.alertType = 'success'
                     this.dismissCountDown = this.dismissSecs
@@ -278,136 +231,46 @@
                     if (error.response && error.response.data && error.response.data.message) {
                         this.alertMessage = error.response.data.message
                         if (this.alertMessage === 'Stock out') {
+
+                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
                             this.alertType = 'warning'
                             this.dismissCountDown = this.dismissSecs
-                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
-                                .map(item => {
-                                    return {
-                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
-                                            true || item.product
-                                            .visibility === false ? 'active' : '',
-                                        Product: {
-                                            img: item.product.imgs[0],
-                                            name: item.product.name,
-                                            stock: item.product.quantity,
-                                            delete: item.product.delete,
-                                            visibility: item.product.visibility,
-                                            deleteitem: item.delete,
-                                        },
-                                        Price: item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter : item.product.price,
-                                        Quantity: [item.quantity, item.product.quantity],
-                                        Total: (item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter :
-                                            item.product.price) * item.quantity,
-                                        delete: 'x-circle',
-                                        id: item._id,
-                                    }
-                                })
-                                this.showskeletonTable=false 
+                            this.showskeletonTable = false
+
                         } else if (this.alertMessage === 'The product is no longer available in the store') {
+
+                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
                             this.alertType = 'danger'
                             this.dismissCountDown = this.dismissSecs
-                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
-                                .map(item => {
-                                    return {
-                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
-                                            true || item.product
-                                            .visibility === false ? 'active' : '',
-                                        Product: {
-                                            img: item.product.imgs[0],
-                                            name: item.product.name,
-                                            stock: item.product.quantity,
-                                            delete: item.product.delete,
-                                            visibility: item.product.visibility,
-                                            deleteitem: item.delete,
-                                        },
-                                        Price: item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter : item.product.price,
-                                        Quantity: [item.quantity, item.product.quantity],
-                                        Total: (item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter :
-                                            item.product.price) * item.quantity,
-                                        delete: 'x-circle',
-                                        id: item._id,
-                                    }
-                                })
-                                this.showskeletonTable=false 
+                            this.showskeletonTable = false
+
                         } else if (this.alertMessage.startsWith('Only')) {
+
+                            await this.createObjectItemInTable(error.response.data.cartUpdate.items) 
                             this.alertType = 'info'
                             this.dismissCountDown = this.dismissSecs
-                            this.items = error.response.data.cartUser.items.filter(ele => ele.delete === false)
-                                .map(item => {
-                                    return {
-                                        _rowVariant: item.product.quantity === 0 || item.product.delete ===
-                                            true || item.product
-                                            .visibility === false ? 'active' : '',
-                                        Product: {
-                                            img: item.product.imgs[0],
-                                            name: item.product.name,
-                                            stock: item.product.quantity,
-                                            delete: item.product.delete,
-                                            visibility: item.product.visibility,
-                                            deleteitem: item.delete,
-                                        },
-                                        Price: item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter : item.product.price,
-                                        Quantity: [item.quantity, item.product.quantity],
-                                        Total: (item.product.promotion.priceAfter > 0 ?
-                                            item.product.promotion.priceAfter :
-                                            item.product.price) * item.quantity,
-                                        delete: 'x-circle',
-                                        id: item._id,
-                                    }
-                                })
-                                this.showskeletonTable=false 
+                            this.showskeletonTable = false
                         }
                     }
                     this.alertMessage = 'A problem has occurred on the server. Please try again later.'
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
+                    this.showskeletonTable = false
 
                 }
             },
 
-
-            async getItems() {
-                try {
-                    const token = localStorage.getItem('tokenCustomer')
-                    const response = await axios.get(
-                        `http://localhost:3000/api/cart/getCart/${window.location.pathname.split('/')[1] }`, {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            }
-                        })
-                    this.items = response.data.cart.items.filter(ele => ele.delete === false)
-                        .map(item => {
-                            return {
-                                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item
-                                    .product
-                                    .visibility === false ? 'active' : '',
-                                Product: {
-                                    img: item.product.imgs[0],
-                                    name: item.product.name,
-                                    stock: item.product.quantity,
-                                    delete: item.product.delete,
-                                    visibility: item.product.visibility,
-                                    deleteitem: item.delete,
-                                },
-                                Price: item.product.promotion.priceAfter > 0 ?
-                                    item.product.promotion.priceAfter : item.product.price,
-                                Quantity: [item.quantity, item.product.quantity],
-                                Total: (item.product.promotion.priceAfter > 0 ?
-                                    item.product.promotion.priceAfter :
-                                    item.product.price) * item.quantity,
-                                delete: 'x-circle',
-                                id: item._id,
-                            }
-                        })
-
-                } catch (error) {
-                    console.log(error)
-                }
+            async getItems(){
+                this.showskeletonTable = true
+               const response = await this.$store.dispatch('cart/ac_getItems')
+               if(response.messageError){
+                    this.alertMessage = response.messageError
+                    this.alertType = 'danger'
+                    this.dismissCountDown = this.dismissSecs
+               }else if(response.messageSuccess){
+                this.showskeletonTable = false
+                
+               }
             }
         },
 
