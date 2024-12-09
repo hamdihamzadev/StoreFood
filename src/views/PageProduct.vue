@@ -314,7 +314,11 @@
                     this.imgSelected = response.data.product.imgs[0]
 
                 } catch (error) {
-                    console.log('error get product in page product is :', error)
+                    if(error.response.data.message||error.response.data.message==='product not found'){
+                        this.alertMessage = 'This product is not available in the store'
+                        this.alertType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+                    }
                 }
             },
 

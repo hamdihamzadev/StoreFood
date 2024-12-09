@@ -11,6 +11,7 @@ import BlogDetail from '@/views/blogDetails/BlogDetails.vue'
 import SignupView from '@/views/loginSign/SignUp.vue'
 import LoginView from '@/views/loginSign/LoginView.vue'
 import ListCategories from '../views/category/ListCategories.vue'
+import ProductNotfound from '../views/ProductNotFound.vue'
 
 
 Vue.use(VueRouter)
@@ -80,6 +81,13 @@ const routes = [
     path: '/:storeName/Login',
     name: 'Login',
     component:LoginView,
+    
+  },
+
+  {
+    path: '/:storeName/ProductNotfound',
+    name: 'ProductNotfound',
+    component:ProductNotfound,
     
   },
 

@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <div v-show="visibleHeader">
+    <div v-show="false">
       <HeaderComp />
     </div>
-    <div v-show="visibleHeader" class="mb-5">
+    <div v-show="false" class="mb-5">
       <SearchSideCollections />
     </div>
     <div class="content">
       <router-view />
     </div>
-    <div v-show="visibleHeader" class="mt-5">
+    <div v-show="false" class="mt-5">
       <FooterStore />
     </div>
   </div>
@@ -31,8 +31,8 @@
 
     computed: {
       visibleHeader() {
-        let path = this.$route.path
-        if (path === '/Signup' || path === '/Login') {
+        let path = this.$route.path.split('/')[2]
+        if (path === '/Signup' || path === '/Login' || path==='/ProductNotfound' ) {
           return false
         } else {
           return true
@@ -63,14 +63,11 @@
         }
       },
 
-   
 
     },
 
     mounted() {
       this.hideHeaderFooter = this.$route.path !== '/Signup' && this.$route.path !== '/Login';
-    
-
     },
 
     watch: {
