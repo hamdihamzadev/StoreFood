@@ -11,7 +11,8 @@ import BlogDetail from '@/views/blogDetails/BlogDetails.vue'
 import SignupView from '@/views/loginSign/SignUp.vue'
 import LoginView from '@/views/loginSign/LoginView.vue'
 import ListCategories from '../views/category/ListCategories.vue'
-import ProductNotfound from '../views/ProductNotFound.vue'
+import PageNotFound from '../views/PageNotFound.vue'
+import ProductCategoryNotFound from '../views/ProductCategorynotFound.vue'
 
 
 Vue.use(VueRouter)
@@ -29,7 +30,7 @@ const routes = [
   },
 
   {
-    path: '/:storeName/:nameproduct/:id',
+    path: '/:storeName/product/:nameproduct/:id',
     name: 'product',
     component: PageProduct,
   },
@@ -85,20 +86,32 @@ const routes = [
   },
 
   {
-    path: '/:storeName/ProductNotfound',
-    name: 'ProductNotfound',
-    component:ProductNotfound,
-    
+    path: '*',
+    name: 'PageNotFound',
+    component:PageNotFound,
+    props:{
+      errorCode:'404',
+      errorMessage:'Page not found'
+    }
   },
 
-
+  {
+    path: '/:storeName/:nameError',
+    name: 'ProductCategoryNotFound',
+    component:ProductCategoryNotFound,
+    props:{
+      errorCode:'404',
+      errorMessage:'Product not found'
+    }
+  },
 
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+
 })
 
 export default router

@@ -75,22 +75,19 @@ const actions = {
                 }
             })
             const items = response.data.updateCart.items
+            console.log(response.data.updateCart.items)
             commit('m_getItems',items)
-            return  {messageSuccess:response.data.message}
+            // return  {messageSuccess:'item add with success'}
         }
         catch(error){
-            if(error.response && error.response.data && error.response.data.message){
-              return  {messageError:error.response.data.message}
-            }else{
-                return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
-            }
+            console.log(error)
+            // if(error.response && error.response.data && error.response.data.message){
+            //     return  {messageError:error.response.data.message}
+            // }
+            // return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
+            
         }
 
-
-        /**
-         * if not update ===> show 
-         */
-        
     },
 
     async ac_getItems({

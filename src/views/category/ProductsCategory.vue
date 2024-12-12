@@ -200,17 +200,24 @@
                                     <!-- NAME -->
                                     <router-link 
                                         tag="a" 
-                                        :to="`/${$route.params.storeName}/${product.name}/${product._id}`">
-                                        <p class=" mb-1">
+                                        :to="`/${$route.params.storeName}/product/${product.name}/${product._id}`">
+                                        <p 
+                                            class=" mb-1">
                                             <strong>{{product.name}}</strong>
                                         </p>
                                     </router-link>
 
                                    <!-- PRICE -->
                                     <div class="mb-3">
-                                        <div  v-if="product.promotion.priceAfter!==0"  class="d-flex align-items-center gap-2">
-                                            <p class="fs-5 text-danger mb-0"><strong>{{ product.promotion.priceAfter  }}€</strong></p>
-                                            <p class="mb-0 text-decoration-line-through" >{{ product.price }}€</p>
+                                        <div  
+                                            v-if="product.promotion.priceAfter!==0"  
+                                            class="d-flex align-items-center gap-2">
+                                            <p 
+                                               class="fs-5 text-danger mb-0">
+                                               <strong>{{ product.promotion.priceAfter  }}€</strong>
+                                            </p>
+                                            <p 
+                                               class="mb-0 text-decoration-line-through" >{{ product.price }}€</p>
                                         </div>
                                         <div v-else class="d-flex align-items-center gap-2">
                                             <p class="fs-5 mb-0"><strong>{{ product.price }}€</strong></p>
@@ -366,6 +373,7 @@ import {
 
         mounted() {
             this.fetchCategories()
+            
             this.getProductsCategory()
 
 

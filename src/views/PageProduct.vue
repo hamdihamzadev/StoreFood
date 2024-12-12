@@ -1,64 +1,41 @@
 <template>
     <section id="pageProduct" class="mb-4">
-        <div class="mb-5">
-            <breadCrumb :titlebreadcrumb="PageProduct" />
-        </div>
         <b-container>
             <b-alert 
-                id="alert"
+                id="alert" 
                 class="position-absolute bottom-0 d-flex align-items-center gap-3"
                 :show="dismissCountDown" 
                 dismissible 
-                :variant="errorType" 
+                :variant="alertTypeColor" 
                 @dismissed="dismissCountDown=0"
                 @dismiss-count-down="dismissSecs">
-                <p class="mb-0"><strong>{{ errorMessage }}</strong></p>
+                <p class="mb-0">
+                    <strong>{{ alertMessage }}</strong>
+                   
+                </p>
             </b-alert>
             <b-row>
-
-                <!-- 
-                if stock === 0
-                if delete === true
-                if visibility === false ====> this produt is not avaivle 
-    
-                -->
                 <b-col lg="6">
                     <div class="position-relative">
-                        <b-img  
-                            class="w-100 mb-3" 
-                            :src="imgSelected">
+                        <b-img class="w-100 mb-3" :src="imgSelected">
                         </b-img>
-                        <button 
-                            :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true " 
+                        <button
+                            :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true "
                             @click="likeProduct"
                             :class="{'activeLike':activeLike===true,'disabledLike':activeLike===false}"
                             class="d-flex align-items-center p-3 rounded position-absolute">
-                            <b-icon 
-                                class="fw-bold" 
-                                :icon="activeLike?'suit-heart-fill':'suit-heart'"
+                            <b-icon class="fw-bold" :icon="activeLike?'suit-heart-fill':'suit-heart'"
                                 aria-hidden="true">
                             </b-icon>
                         </button>
-                        <b-alert 
-                            v-model="showBottom" 
-                            class="position-fixed fixed-top m-0 rounded-0"
-                            style="z-index: 2000;" 
-                            variant="success" 
-                            dismissible>
+                        <b-alert v-model="showBottom" class="position-fixed fixed-top m-0 rounded-0"
+                            style="z-index: 2000;" variant="success" dismissible>
                             You are add product to favoirs!
                         </b-alert>
                     </div>
-                    <VueSlickCarousel 
-                        v-bind="settings">
-                        <div 
-                            v-for="item in myProduct.imgs" 
-                            :key="item.id" 
-                            class="bg-dark text-white">
-                            <b-img 
-                                id="img-carousel" 
-                                @click="getImg(item)" 
-                                class="w-100" 
-                                :src="item">
+                    <VueSlickCarousel v-bind="settings">
+                        <div v-for="item in myProduct.imgs" :key="item.id" class="bg-dark text-white">
+                            <b-img id="img-carousel" @click="getImg(item)" class="w-100" :src="item">
                             </b-img>
                         </div>
                     </VueSlickCarousel>
@@ -92,35 +69,29 @@
                         </div>
                         <b-row>
 
-                            <b-col 
-                                lg="3" 
-                                class="mb-3 mb-lg-0" 
-                                style="height: 50px;">
-                                <b-form-spinbutton 
-                                    :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true" 
-                                    class="h-100" 
-                                    id="InputQuantity" 
-                                    v-model="ValueQuantity" 
-                                    min="1"
+                            <b-col lg="3" class="mb-3 mb-lg-0" style="height: 50px;">
+                                <b-form-spinbutton
+                                    :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true"
+                                    class="h-100" id="InputQuantity" v-model="ValueQuantity" min="1"
                                     :max="myProduct.quantity">
                                 </b-form-spinbutton>
                             </b-col>
                             <b-col lg="9" style="height: 50px;">
 
-                                <b-button 
-                                    :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true" 
+                                <b-button
+                                    :disabled="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true"
                                     @click="addToCart()" id="btn-addPrd"
                                     class="h-100 w-100 d-flex align-items-center justify-content-center gap-3">
-                                    <b-icon 
-                                        icon="cart-plus" 
-                                        aria-hidden="true">
+                                    <b-icon icon="cart-plus" aria-hidden="true">
                                     </b-icon>
                                     <strong>ADD TO CART</strong>
                                 </b-button>
                             </b-col>
 
-                            <b-col class="mt-4" v-if="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true" >
-                                <p class="text-danger w-100 text-center" ><strong>The product is no longer available in the store</strong></p>
+                            <b-col class="mt-4"
+                                v-if="myProduct.quantity===0 || myProduct.visibility===false || myProduct.delete===true">
+                                <p class="text-danger w-100 text-center"><strong>The product is no longer available in
+                                        the store</strong></p>
                             </b-col>
 
                         </b-row>
@@ -152,8 +123,6 @@
                     </div>
                 </b-col>
             </b-row>
-
-            <p>{{myProduct}}</p>
 
             <!-- descption product --->
 
@@ -224,7 +193,7 @@
 </template>
 
 <script>
-    import breadCrumb from '@/components/BreadCrumb.vue';
+    // import breadCrumb from '@/components/BreadCrumb.vue';
     import VueSlickCarousel from 'vue-slick-carousel'
     import ProductItem from '../components/ProductItem.vue'
     import axios from 'axios';
@@ -235,7 +204,7 @@
     export default {
         name: 'PageProduct',
         components: {
-            breadCrumb,
+            // breadCrumb,
             VueSlickCarousel,
             ProductItem
         },
@@ -280,9 +249,9 @@
 
                 // alert
                 dismissCountDown: 0,
-                dismissSecs: 2,
-                errorType: '',
-                errorMessage: ''
+                dismissSecs: 6,
+                alertTypeColor: '',
+                alertMessage: ''
 
             };
         },
@@ -313,14 +282,22 @@
                     this.myProduct = response.data.product
                     this.imgSelected = response.data.product.imgs[0]
 
+
                 } catch (error) {
-                    if(error.response.data.message||error.response.data.message==='product not found'){
-                        this.alertMessage = 'This product is not available in the store'
-                        this.alertType = 'danger'
-                        this.dismissCountDown = this.dismissSecs
+                    if (error) {
+                        if(this.$route.path.split('/')[2]!=='ProductNotFound'){
+                            this.$router.push({
+                            name: 'ProductCategoryNotFound',
+                            params: {
+                                storeName: this.$route.path.split('/')[1],
+                                nameError: 'ProductNotFound'
+                            }
+                        })
+                        }
                     }
                 }
             },
+
 
             async getProductsCategory() {
                 try {
@@ -347,20 +324,28 @@
                     product: this.$route.params.id,
                     quantity: this.ValueQuantity,
                 }
-                
+
                 const tokenUser = localStorage.getItem('tokenCustomer')
                 if (tokenUser) {
-                    const response = await this.$store.dispatch('cart/ac_addItem',formItem)
+                    await this.$store.dispatch('cart/ac_addItem', formItem)
 
-                    if (response.messageSuccess) {
-                        this.alertMessage = response.messageSuccess
-                        this.alertType = 'success'
-                        this.dismissCountDown = this.dismissSecs
-                    } else if (response.messageError || response.messageErrorServe) {
-                        this.alertMessage = response.messageError || response.messageErrorServe
-                        this.alertType = 'danger'
-                        this.dismissCountDown = this.dismissSecs
-                    }
+                    // if (response && response.messageSuccess) {
+
+                    //     this.alertMessage = response.messageSuccess
+                    //     this.alertTypeColor = 'success'
+                    //     this.dismissCountDown = this.dismissSecs
+
+                    // } else if (response && (response.messageError || response.messageErrorServe)) {
+
+                    //     this.alertMessage = response.messageError || response.messageErrorServe
+                    //     this.alertTypeColor = 'danger'
+                    //     this.dismissCountDown = this.dismissSecs
+                        
+                    // }else{
+                    //     this.alertMessage = 'An unexpected error occurred. Please try again.'
+                    //     this.alertTypeColor = 'danger';
+                    //     this.dismissCountDown = this.dismissSecs;
+                    // }
 
                 } else {
                     this.showModalConnect()
@@ -385,9 +370,11 @@
             }
         },
 
-        mounted() {
-            this.PageProduct = this.$route.path.slice(1);
-            this.getProduct()
+        async mounted() {
+            await this.getProduct()
+           
+
+
         },
     }
 </script>
@@ -566,3 +553,12 @@
         z-index: 9999;
     }
 </style>
+
+
+<!-- 
+- page not found ===> if not found ==> show page 
+- hide header and footer 
+- solution for page all page have :id
+- if on page error ==> onclick prev ==> domaine name work
+
+-->
