@@ -115,7 +115,6 @@ const actions = {
             return {
                 messageError: 'Error in the server try again'
             }
-
         }
     },
 
@@ -163,7 +162,7 @@ const actions = {
                     Authorization: `Bearer ${token}`
                 }
             })
-            const items = response.data.cartAfterDeleteItem.items
+            const items = response.data.cart.items
             commit('m_getItems', items)
             return {
                 messageSuccess: response.data.message

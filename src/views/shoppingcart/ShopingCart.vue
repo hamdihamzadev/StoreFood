@@ -253,13 +253,16 @@
             async getItems() {
                 this.showskeletonTable = true
                 const response = await this.$store.dispatch('cart/ac_getItems')
-                if (response.messageError) {
+                if (response && response.messageSuccess) {
+                    this.showskeletonTable = false
+                } else if (response && response.messageError) {
                     this.alertMessage = response.messageError
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-                } else if (response.messageSuccess) {
-                    this.showskeletonTable = false
-
+                }else{
+                    this.alertMessage = 'An unexpected error occurred. Please try again.'
+                    this.alertType = 'danger'
+                    this.dismissCountDown = this.dismissSecs
                 }
             }
         },
