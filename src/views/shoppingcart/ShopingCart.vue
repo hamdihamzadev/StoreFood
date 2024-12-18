@@ -35,7 +35,9 @@
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
                         <b-form-spinbutton
                             :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
-                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1"
+                            class="text-center w-50 h-50" id="InputQuantity" 
+                            v-model="data.value[0]" 
+                            min="1" 
                             @change="onQuantityChange(data.item.id,data.value[0])">
                         </b-form-spinbutton>
                     </div>
@@ -150,7 +152,7 @@
 
                 // alert
                 dismissCountDown: 0,
-                dismissSecs: 2,
+                dismissSecs: 4,
                 alertType: '',
                 alertMessage: '',
 
@@ -187,53 +189,77 @@
 
             async deleteItem(itemId) {
                 this.showskeletonTable = true
-                try {
-                    const confirme = confirm('Are you sure you want to delete this item ?')
-                    if (confirme) {
-                        await this.$store.dispatch('cart/ac_deleteItem', itemId)
-                        this.alertMessage = 'Item is deleted with success'
+                const confirme = confirm('Are you sure you want to delete this item ?')
+                if (confirme) {
+                    const response = await this.$store.dispatch('cart/ac_deleteItem', itemId)
+                    if (response && response.messageSuccess) {
+
+                        this.alertMessage = response.messageSuccess
                         this.alertType = 'success'
                         this.dismissCountDown = this.dismissSecs
-                        this.showskeletonTable = false
+
+                    } else if (response && (response.messageError || response.messageErrorServe)) {
+
+                        this.alertMessage = response.messageError || response.messageErrorServe
+                        this.alertType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+                    } else {
+                        this.alertMessage = 'An unexpected error occurred. Please try again.'
+                        this.alertTypeColor = 'danger';
+                        this.dismissCountDown = this.dismissSecs;
                     }
-                } catch (error) {
-                    this.alertMessage = 'A problem has occurred on the server. Please try again later.'
-                    this.alertType = 'danger'
-                    this.dismissCountDown = this.dismissSecs
+
+                    this.showskeletonTable = false
+                } else {
                     this.showskeletonTable = false
                 }
+
             },
 
 
             async onQuantityChange(id, newQuantity) {
 
-                this.showskeletonTable = true
-                const response = await this.$store.dispatch('cart/ac_addItem',{id,newQuantity})
 
-                if(response.messageSuccess){
+                this.showskeletonTable = true
+
+                const response = await this.$store.dispatch('cart/ac_updateQuntityItem', {
+                    id,
+                    newQuantity
+                })
+
+                if (response && response.messageSuccess) {
+
                     this.alertMessage = response.messageSuccess
                     this.alertType = 'success'
                     this.dismissCountDown = this.dismissSecs
-                }else if(response.messageError || response.messageErrorServe){
+
+                } else if (response && (response.messageError || response.messageErrorServe)) {
+
                     this.alertMessage = response.messageError || response.messageErrorServe
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
+                } else {
+                    this.alertMessage = 'An unexpected error occurred. Please try again.'
+                    this.alertTypeColor = 'danger';
+                    this.dismissCountDown = this.dismissSecs
+                    
                 }
 
                 this.showskeletonTable = false
 
+
             },
 
-            async getItems(){
+            async getItems() {
                 this.showskeletonTable = true
                 const response = await this.$store.dispatch('cart/ac_getItems')
-                if(response.messageError){
+                if (response.messageError) {
                     this.alertMessage = response.messageError
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-                }else if(response.messageSuccess){
-                this.showskeletonTable = false
-                
+                } else if (response.messageSuccess) {
+                    this.showskeletonTable = false
+
                 }
             }
         },
@@ -332,3 +358,15 @@
         z-index: 9999;
     }
 </style>
+
+
+<!-- 
+===============> stock is 10  
+=====> commander 11 
+=====> message : max is 10  
+=====> click to checkout  
+=====> verification stock product 
+=====> message for any product stock is diminuer
+=====> getcart
+=====> if any product is 
+-->

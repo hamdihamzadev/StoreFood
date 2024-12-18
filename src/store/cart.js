@@ -2,7 +2,7 @@ import axios from "axios";
 
 const state = {
     items: [],
-    cart:{}
+    cart: {}
 }
 
 const mutations = {
@@ -11,30 +11,30 @@ const mutations = {
         state.cart = newCart
     },
 
-    m_getItems(state,items) {
-        state.items=items
-        .filter(item=>item.delete===false)
-        .map(item => {
-            return {
-                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'active' : '',
-                Product: {
-                    img: item.product.imgs[0],
-                    name: item.product.name,
-                    stock: item.product.quantity,
-                    delete: item.product.delete,
-                    visibility: item.product.visibility,
-                    deleteitem: item.delete,
-                },
-                Price: item.product.promotion.priceAfter > 0 ?
-                    item.product.promotion.priceAfter : item.product.price,
-                Quantity: [item.quantity, item.product.quantity],
-                Total: (item.product.promotion.priceAfter > 0 ?
-                    item.product.promotion.priceAfter :
-                    item.product.price) * item.quantity,
-                delete: 'x-circle',
-                id: item._id,
-            }
-        })
+    m_getItems(state, items) {
+        state.items = items
+            .map(item => {
+                return {
+                    _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'active' : '',
+                    Product: {
+                        img: item.product.imgs[0],
+                        name: item.product.name,
+                        stock: item.product.quantity,
+                        delete: item.product.delete,
+                        visibility: item.product.visibility,
+                        deleteitem: item.delete,
+                    },
+                    Price: item.product.promotion.priceAfter > 0 ?
+                        item.product.promotion.priceAfter : item.product.price,
+                    Quantity: [item.quantity, item.product.quantity],
+                    Total: (item.product.promotion.priceAfter > 0 ?
+                        item.product.promotion.priceAfter :
+                        item.product.price) * item.quantity,
+                    delete: 'x-circle',
+                    id: item._id,
+                }
+            })
+
     },
 
 }
@@ -66,7 +66,7 @@ const actions = {
         commit
     }, formItem) {
 
-        try{
+        try {
             const token = localStorage.getItem('tokenCustomer')
             const cartId = localStorage.getItem('cartUser')
             const response = await axios.post(`http://localhost:3000/api/cart/addItem/${cartId}`, formItem, {
@@ -74,18 +74,21 @@ const actions = {
                     Authorization: `Bearer ${token}`
                 }
             })
-            const items = response.data.updateCart.items
-            console.log(response.data.updateCart.items)
-            commit('m_getItems',items)
-            // return  {messageSuccess:'item add with success'}
-        }
-        catch(error){
-            console.log(error)
-            // if(error.response && error.response.data && error.response.data.message){
-            //     return  {messageError:error.response.data.message}
-            // }
-            // return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
-            
+            const items = response.data.cart.items
+            commit('m_getItems', items)
+            return {
+                messageSuccess:response.data.message
+            }
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                return {
+                    messageError: error.response.data.message
+                }
+            }
+            return {
+                messageErrorServe: 'A problem has occurred on the server. Please try again later.'
+            }
+
         }
 
     },
@@ -102,13 +105,17 @@ const actions = {
                     }
                 })
             const items = response.data.cart.items
-            commit('m_getItems',items)
+            commit('m_getItems', items)
             localStorage.setItem('cartUser', response.data.cart._id)
-            return {messageSuccess:'items get with success'}
+            return {
+                messageSuccess: 'items get with success'
+            }
 
         } catch (error) {
-            return {messageError:'Error in the server try again'}
-            
+            return {
+                messageError: 'Error in the server try again'
+            }
+
         }
     },
 
@@ -118,33 +125,59 @@ const actions = {
         id,
         newQuantity
     }) {
-        const cartId = localStorage.getItem('cartUser')
-        const token = localStorage.getItem('tokenCustomer')
-        const response = await axios.put(`http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
-            newQuantity
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`,
+        try {
+            const cartId = localStorage.getItem('cartUser')
+            const token = localStorage.getItem('tokenCustomer')
+            const response = await axios.put(`http://localhost:3000/api/cart/UpdateQuantity/${cartId}/${id}`, {
+                newQuantity
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            const items = response.data.cartUpdate.items
+            commit('m_getItems', items)
+            return {messageSuccess:response.data.message}
+
+        } catch (error) {
+
+            if(error.response.data.message){
+                const items = error.response.data.cartUser.items
+                commit('m_getItems', items)
+                console.log('errroo====>', items)
+                
+                return {messageError:error.response.data.message}
             }
-        })
-        const items = response.data.cartUpdate.items
-        commit('m_getItems', items )
-        return response
+            return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
+        }
     },
 
     async ac_deleteItem({
         commit
     }, itemId) {
-        const cartId = localStorage.getItem('cartUser')
-        const token = localStorage.getItem('tokenCustomer')
-        const response= await axios.put(`http://localhost:3000/api/cart/DeleteItem/${cartId}/${itemId}`, {} , {
-            headers: {
-                Authorization: `Bearer ${token}`
+        try {
+            const cartId = localStorage.getItem('cartUser')
+            const token = localStorage.getItem('tokenCustomer')
+            const response = await axios.put(`http://localhost:3000/api/cart/DeleteItem/${cartId}/${itemId}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            const items = response.data.cartAfterDeleteItem.items
+            commit('m_getItems', items)
+            return {
+                messageSuccess: response.data.message
             }
-        })
-        const items=response.data.cartAfterDeleteItem.items.filter(ele=>ele.delete===false)
-        commit('m_getItems',items)
-        return response
+        } catch (error) {
+            if (error.response.data.message) {
+                return {
+                    messageError: error.response.data.message
+                }
+            }
+            return {
+                messageErrorServe: 'A problem has occurred on the server. Please try again later.'
+            }
+        }
     }
 }
 

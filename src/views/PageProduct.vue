@@ -327,25 +327,25 @@
 
                 const tokenUser = localStorage.getItem('tokenCustomer')
                 if (tokenUser) {
-                    await this.$store.dispatch('cart/ac_addItem', formItem)
+                   const response= await this.$store.dispatch('cart/ac_addItem', formItem)
 
-                    // if (response && response.messageSuccess) {
+                    if (response && response.messageSuccess) {
 
-                    //     this.alertMessage = response.messageSuccess
-                    //     this.alertTypeColor = 'success'
-                    //     this.dismissCountDown = this.dismissSecs
+                        this.alertMessage = response.messageSuccess
+                        this.alertTypeColor = 'success'
+                        this.dismissCountDown = this.dismissSecs
 
-                    // } else if (response && (response.messageError || response.messageErrorServe)) {
+                    }else if (response && (response.messageError || response.messageErrorServe)) {
 
-                    //     this.alertMessage = response.messageError || response.messageErrorServe
-                    //     this.alertTypeColor = 'danger'
-                    //     this.dismissCountDown = this.dismissSecs
+                        this.alertMessage = response.messageError || response.messageErrorServe
+                        this.alertTypeColor = 'danger'
+                        this.dismissCountDown = this.dismissSecs
                         
-                    // }else{
-                    //     this.alertMessage = 'An unexpected error occurred. Please try again.'
-                    //     this.alertTypeColor = 'danger';
-                    //     this.dismissCountDown = this.dismissSecs;
-                    // }
+                    }else{
+                        this.alertMessage = 'An unexpected error occurred. Please try again.'
+                        this.alertTypeColor = 'danger';
+                        this.dismissCountDown = this.dismissSecs;
+                    }
 
                 } else {
                     this.showModalConnect()
