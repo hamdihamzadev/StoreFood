@@ -92,15 +92,22 @@
 
             <b-row class="mt-5">
                 <b-col cols="12" lg="6">
-                    <b-button class="px-5 py-3  w-100 mb-2 mb-lg-" id="btn-updatecart"><strong class="small">CONTINUE
-                            SHOPPING</strong>
+                    <router-link :to="`/${$route.params.storeName}`">
+                        <b-button  class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 " id="btn-continuershop">
+                        <b-icon icon="bag" aria-hidden="true"></b-icon>
+                        <strong class="small">
+                        CONTINUE SHOPPING
+                        </strong>
                     </b-button>
+                    </router-link>
                 </b-col>
                 <b-col cols="12" lg="6" class="d-flex justify-content-lg-end">
-                    <b-button id="btn-continuershop"
+                    <b-button id="btn-updatecart"
                         class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 ">
-                        <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon> <strong class="small">UPDATE
-                            CART</strong>
+                        <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon> 
+                        <strong class="small">
+                            UPDATE CART
+                        </strong>
                     </b-button>
                 </b-col>
 
@@ -129,7 +136,9 @@
                             <p>Total</p>
                             <p class="text-danger">$ {{ totalCart }}</p>
                         </div>
-                        <b-button class="mt-4 w-100 py-2 fw-bold small " id="btn-tocheckout">PROCEED TO CHECKOUT
+                        <b-button  class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5" id="btn-tocheckout">
+                            <strong>PROCEED TO CHECKOUT</strong>
+                            <b-icon icon="arrow-right" aria-hidden="true"></b-icon> 
                         </b-button>
                     </div>
                 </b-col>
@@ -298,16 +307,40 @@
 
     }
 
-    #btn-updatecart,
-    #btn-continuershop {
-        background-color: var(--secondary-color);
-        border: var(--secondary-color);
-        color: #929292;
+     #btn-updatecart{
+        background-color: var(--primary-color);
+        color: var(--thirday-color);
+        border: 1px solid var(--thirday-color);
+        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+    }
+
+     #btn-updatecart:hover{
+        background-color: var(--thirday-color);
+        color: var(--primary-color);
+    }
+
+    #btn-continuershop{
+        background-color: var(--thirday-color);
+        color: var(--primary-color);
+        border: 1px solid var(--thirday-color);
+        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+    }
+
+    #btn-continuershop:hover{
+        background-color: var(--primary-color);
+        color: var(--thirday-color);
     }
 
     #btn-tocheckout {
         background-color: var(--thirday-color);
-        border: none;
+        color: var(--primary-color);
+        border: 1px solid var(--thirday-color);
+        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+    }
+
+    #btn-tocheckout:hover {
+        background-color: var(--primary-color);
+        color: var(--thirday-color);
     }
 
     #bg-total {
