@@ -12,6 +12,7 @@ const mutations = {
     },
 
     m_getItems(state, items) {
+
         state.items = items
             .map(item => {
                 return {
@@ -77,7 +78,7 @@ const actions = {
             const items = response.data.cart.items
             commit('m_getItems', items)
             return {
-                messageSuccess:response.data.message
+                messageSuccess: response.data.message
             }
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -136,16 +137,22 @@ const actions = {
             })
             const items = response.data.cart.items
             commit('m_getItems', items)
-            return {messageSuccess:response.data.message}
+            return {
+                messageSuccess: response.data.message
+            }
 
         } catch (error) {
 
-            if(error.response.data.message){
+            if (error.response.data.message) {
                 const items = error.response.data.cart.items
                 commit('m_getItems', items)
-                return {messageError:error.response.data.message}
+                return {
+                    messageError: error.response.data.message
+                }
             }
-            return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
+            return {
+                messageErrorServe: 'A problem has occurred on the server. Please try again later.'
+            }
         }
     },
 

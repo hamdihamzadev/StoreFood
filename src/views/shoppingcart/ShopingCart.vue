@@ -21,12 +21,20 @@
                             <span> {{ data.item.Product.name }}</span>
                             <span>Stock :
                                 <span class="text-success">{{ data.value.stock }}</span>
-                                <span v-if="data.value.stock<data.item.Quantity[0]" class="text-danger">Reduce the
-                                    quantity to {{ data.value.stock }}.</span>
+                                <span 
+                                    v-if="data.value.stock > 0 && data.value.stock < data.item.Quantity[0]" 
+                                    class="text-danger">
+                                    Reduce the quantity 
+                                </span>
                             </span>
-                            <span v-if=" data.value.stock===0">Stock out</span>
-                            <span v-else-if=" data.value.delete===true || data.value.visibility===false ">Product not
-                                dispo</span>
+                            <span 
+                                class="text-danger"
+                                v-if=" data.value.stock===0">Stock out
+                            </span>
+                            <span 
+                                v-else-if=" data.value.delete===true || data.value.visibility===false ">
+                                Product not dispo
+                            </span>
                         </div>
                     </div>
                 </template>
@@ -102,7 +110,6 @@
                 <!-- discount and  -->
                 <b-col cols="12" lg="6" class="pe-lg-5 mb-3 mb-lg-0">
                     <p class="mb-4 fs-5 fw-bold"><strong>Discount Codes</strong></p>
-
                     <b-form class="d-flex gap-3 flex-column flex-lg-row">
                         <b-form-input id="input-coupon" class="h-100 " placeholder="Enter your coupon">
                         </b-form-input>
