@@ -12,6 +12,7 @@
         <b-spinner type="grow" label="Loading..." v-show="showSpinner"></b-spinner>
         <!-- alert -->
         <b-container class="px-lg-5 ">
+
             <b-table v-show="showskeletonTable===false" small :per-page="perPage" :current-page="currentPage"
                 id="tableOrders" :items="itemsInTable" hover responsive>
                 <template #cell(Product)="data">
@@ -21,18 +22,14 @@
                             <span> {{ data.item.Product.name }}</span>
                             <span>Stock :
                                 <span class="text-success">{{ data.value.stock }}</span>
-                                <span 
-                                    v-if="data.value.stock > 0 && data.value.stock < data.item.Quantity[0]" 
+                                <span v-if="data.value.stock > 0 && data.value.stock < data.item.Quantity[0]"
                                     class="text-danger">
-                                    Reduce the quantity 
+                                    Reduce the quantity
                                 </span>
                             </span>
-                            <span 
-                                class="text-danger"
-                                v-if=" data.value.stock===0">Stock out
+                            <span class="text-danger" v-if=" data.value.stock===0">Stock out
                             </span>
-                            <span 
-                                v-else-if=" data.value.delete===true || data.value.visibility===false ">
+                            <span v-else-if=" data.value.delete===true || data.value.visibility===false ">
                                 Product not dispo
                             </span>
                         </div>
@@ -43,9 +40,7 @@
                     <div style="height: 100px;" id="spin" class="d-flex align-items-center">
                         <b-form-spinbutton
                             :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
-                            class="text-center w-50 h-50" id="InputQuantity" 
-                            v-model="data.value[0]" 
-                            min="1" 
+                            class="text-center w-50 h-50" id="InputQuantity" v-model="data.value[0]" min="1"
                             @change="onQuantityChange(data.item.id,data.value[0])">
                         </b-form-spinbutton>
                     </div>
@@ -93,24 +88,24 @@
             <b-row class="mt-5">
                 <b-col cols="12" lg="6">
                     <router-link :to="`/${$route.params.storeName}`">
-                        <b-button  class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 " id="btn-continuershop">
-                        <b-icon icon="bag" aria-hidden="true"></b-icon>
-                        <strong class="small">
-                        CONTINUE SHOPPING
-                        </strong>
-                    </b-button>
+                        <b-button class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 "
+                            id="btn-continuershop">
+                            <b-icon icon="bag" aria-hidden="true"></b-icon>
+                            <strong class="small">
+                                CONTINUE SHOPPING
+                            </strong>
+                        </b-button>
                     </router-link>
                 </b-col>
                 <b-col cols="12" lg="6" class="d-flex justify-content-lg-end">
-                    <b-button id="btn-updatecart"
+                    <b-button id="btn-updatecart" @click="updateCart()"
                         class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 ">
-                        <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon> 
+                        <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon>
                         <strong class="small">
                             UPDATE CART
                         </strong>
                     </b-button>
                 </b-col>
-
             </b-row>
 
             <b-row class="mt-5">
@@ -136,9 +131,10 @@
                             <p>Total</p>
                             <p class="text-danger">$ {{ totalCart }}</p>
                         </div>
-                        <b-button  class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5" id="btn-tocheckout">
+                        <b-button class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5"
+                            id="btn-tocheckout">
                             <strong>PROCEED TO CHECKOUT</strong>
-                            <b-icon icon="arrow-right" aria-hidden="true"></b-icon> 
+                            <b-icon icon="arrow-right" aria-hidden="true"></b-icon>
                         </b-button>
                     </div>
                 </b-col>
@@ -258,7 +254,7 @@
                     this.alertMessage = 'An unexpected error occurred. Please try again.'
                     this.alertTypeColor = 'danger';
                     this.dismissCountDown = this.dismissSecs
-                    
+
                 }
 
                 this.showskeletonTable = false
@@ -275,10 +271,39 @@
                     this.alertMessage = response.messageError
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
-                }else{
+                } else {
                     this.alertMessage = 'An unexpected error occurred. Please try again.'
                     this.alertType = 'danger'
                     this.dismissCountDown = this.dismissSecs
+                }
+            },
+
+            async updateCart() {
+
+                const confirme = confirm('Are you sure you want to delete this item ?')
+                if (confirme) {
+                    this.showskeletonTable = true
+                    const response =await this.$store.dispatch('cart/ac_deleteAllItems')
+                    console.log( 'this is msg ==>', response.messageSuccess )
+                    
+                    if (response && response.messageSuccess ) {
+
+                        this.alertMessage = response.messageSuccess
+                        this.alertType = 'success'
+                        this.dismissCountDown = this.dismissSecs
+
+                    } else if (response && (response.messageError || response.messageErrorServe)) {
+
+                        this.alertMessage = response.messageError || response.messageErrorServe
+                        this.alertType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+
+                    } else {
+                        this.alertMessage = 'An unexpected error occurred. Please try again .'
+                        this.alertType = 'danger'
+                        this.dismissCountDown = this.dismissSecs
+                    }
+                    this.showskeletonTable = false
                 }
             }
         },
@@ -307,26 +332,26 @@
 
     }
 
-     #btn-updatecart{
+    #btn-updatecart {
         background-color: var(--primary-color);
         color: var(--thirday-color);
         border: 1px solid var(--thirday-color);
-        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
     }
 
-     #btn-updatecart:hover{
+    #btn-updatecart:hover {
         background-color: var(--thirday-color);
         color: var(--primary-color);
     }
 
-    #btn-continuershop{
+    #btn-continuershop {
         background-color: var(--thirday-color);
         color: var(--primary-color);
         border: 1px solid var(--thirday-color);
-        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
     }
 
-    #btn-continuershop:hover{
+    #btn-continuershop:hover {
         background-color: var(--primary-color);
         color: var(--thirday-color);
     }
@@ -335,7 +360,7 @@
         background-color: var(--thirday-color);
         color: var(--primary-color);
         border: 1px solid var(--thirday-color);
-        transition: background-color 0.3s ease , color 0.3s ease , border 0.3s ease ;
+        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
     }
 
     #btn-tocheckout:hover {

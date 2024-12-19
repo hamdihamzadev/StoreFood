@@ -182,6 +182,33 @@ const actions = {
                 messageErrorServe: 'A problem has occurred on the server. Please try again later.'
             }
         }
+    },
+
+    async ac_deleteAllItems({commit}){
+        try{
+            const cartId = localStorage.getItem('cartUser')
+            const token = localStorage.getItem('tokenCustomer')
+            const response= await axios.put(`http://localhost:3000/api/cart/deleteAllItems/${cartId}`,{},{
+                headers: {
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            const items=response.data.cart.items
+            commit('m_getItems', items)
+            return{
+                messageSuccess:response.data.message
+            }
+        }
+        catch(error){
+            if (error.response.data.message) {
+                return {
+                    messageError: error.response.data.message
+                }
+            }
+            return {
+                messageErrorServe: 'A problem has occurred on the server. Please try again later.'
+            }
+        }
     }
 }
 
