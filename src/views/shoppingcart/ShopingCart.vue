@@ -74,7 +74,6 @@
                     <td class="d-none">{{ data.value }}</td>
                 </template>
 
-
             </b-table>
 
             <b-skeleton-table v-show="showskeletonTable" :rows="5" :columns="4"
@@ -124,12 +123,16 @@
                         <p class="mb-4 fs-4 fw-bold"><strong>Cart Total</strong></p>
                         <div class="d-flex justify-content-between fw-bold fs-5">
                             <p>Subtotal</p>
-                            <p class="text-danger">$ {{ totalCart }}</p>
+                            <p class="text-subtotal">$ {{ subtotalCart }}</p>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold fs-5 mt-3">
+                            <p class="text-shipping" >Shipping</p>
+                            <p class="text-shipping">$ {{ TotalshippingCart }}</p>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold fs-5">
                             <p>Total</p>
-                            <p class="text-danger">$ {{ totalCart }}</p>
+                            <p class="text-danger">$ {{ subtotalCart + TotalshippingCart }}</p>
                         </div>
                         <b-button class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5"
                             id="btn-tocheckout">
@@ -187,8 +190,12 @@
                 return this.items
             },
 
-            totalCart() {
-                return this.items.reduce((accu, item) => accu + item.Total, 0)
+            subtotalCart(){
+                return this.items.reduce((accu,item)=> accu + item.Total, 0 )
+            },
+
+            TotalshippingCart(){
+                return this.items.reduce((accu,item)=> accu + item.Product.shipping,0 )
             },
 
             rows() {
@@ -370,6 +377,15 @@
 
     #bg-total {
         background-color: var(--secondary-color);
+    }
+
+    .text-shipping{
+        color:var(--paragraph-color);
+        font-weight: lighter;
+    }
+
+    .text-subtotal{
+        color:var(--thirday-color);
     }
 
     #input-coupon:focus {
