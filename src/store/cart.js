@@ -134,17 +134,15 @@ const actions = {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            const items = response.data.cartUpdate.items
+            const items = response.data.cart.items
             commit('m_getItems', items)
             return {messageSuccess:response.data.message}
 
         } catch (error) {
 
             if(error.response.data.message){
-                const items = error.response.data.cartUser.items
+                const items = error.response.data.cart.items
                 commit('m_getItems', items)
-                console.log('errroo====>', items)
-                
                 return {messageError:error.response.data.message}
             }
             return {messageErrorServe:'A problem has occurred on the server. Please try again later.'}
