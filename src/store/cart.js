@@ -12,32 +12,10 @@ const mutations = {
     },
 
     m_getItems(state, items) {
-        console.log(items.map(item => {
-            return {
-                _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'active' : '',
-                Product: {
-                    img: item.product.imgs[0],
-                    name: item.product.name,
-                    stock: item.product.quantity,
-                    delete: item.product.delete,
-                    visibility: item.product.visibility,
-                    deleteitem: item.delete,
-                    shipping:item.product.shipping
-                },
-                Price: item.product.promotion.priceAfter > 0 ?
-                    item.product.promotion.priceAfter : item.product.price,
-                Quantity: [item.quantity, item.product.quantity],
-                Total: (item.product.promotion.priceAfter > 0 ?
-                    item.product.promotion.priceAfter :
-                    item.product.price) * item.quantity,
-                delete: 'x-circle',
-                id: item._id,
-            }
-        }))
         state.items = items
             .map(item => {
                 return {
-                    _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'active' : '',
+                    _rowVariant: item.product.quantity === 0 || item.product.delete === true || item.product.visibility === false ? 'danger' : '',
                     Product: {
                         img: item.product.imgs[0],
                         name: item.product.name,
@@ -57,7 +35,6 @@ const mutations = {
                     id: item._id,
                 }
             })
-
     },
 
 }

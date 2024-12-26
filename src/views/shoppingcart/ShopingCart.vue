@@ -10,7 +10,76 @@
             <p class="mb-0"><strong>{{ alertMessage }}</strong></p>
         </b-alert>
         <b-spinner type="grow" label="Loading..." v-show="showSpinner"></b-spinner>
+
+
         <!-- alert -->
+        <!-- Modal checkout error -->
+        <b-modal  size="xl" id="modalErroToCheckout" title="Availability Products">
+            <b-table v-show="showskeletonTable===false" small :per-page="perPage" :current-page="currentPage"
+                id="tableOrders" :fields="fieldsModalProductStatus" :items="itemsErrorInGoToCheckout" hover responsive>
+
+                <template #cell(Product)="data">
+                    <b-img id="img-product" :src="data.item.Product.img"></b-img>
+                    <p>{{ data.item.Product.name }}</p>
+                </template>
+
+                <!-- STATUS -->
+                <template #cell(Status)="data">
+                    <p class="text-danger"
+                        v-if="data.item.Product.delete===true || data.item.Product.visibility===false">
+                        <b-icon icon="exclamation-triangle" scale="1" variant="danger">
+                        </b-icon>
+                        This product is not available.
+                    </p>
+                    <p class="text-danger" v-else-if="data.item.Product.stock===0">
+                        Stock out
+                    </p>
+                    <p class="text-danger" v-else-if="data.item.Product.stock < data.item.Quantity">
+                        {{ `Only ${data.item.Product.stock} items are left in stock; please reduce the quantity` }}
+                    </p>
+                </template>
+
+                <template #cell(Quantity)="data">
+
+                    <div style="height: 100px;" id="spin" class="d-flex align-items-center">
+                        <b-form-spinbutton
+                            :disabled="data.item.Product.delete===true || data.item.Product.visibility===false || data.item.Product.stock===0"
+                            class="text-center w-50 h-50 border"
+                            :class="data.item.Quantity>data.item.Product.Quantity?'border border-danger text-danger' : ''"
+                            id="InputQuantity" v-model="data.value[0]" min="1"
+                            @change="onQuantityChange(data.item.id,data.value[0])">
+                        </b-form-spinbutton>
+                    </div>
+
+                </template>
+
+                <!-- Colonne isActive -->
+                <template #head(delete)>
+                    <th class="d-none"></th>
+                </template>
+
+                <template #cell(delete)="data">
+                    <b-dropdown-item-button @click="deleteItem(data.item.id)">
+                        <b-icon :icon="data.item.delete" aria-hidden="true" scale="1" variant="danger"></b-icon>
+                    </b-dropdown-item-button>
+                </template>
+
+                <template #head(id)>
+                    <th class="d-none"></th>
+                </template>
+                <template #cell(id)="data">
+                    <td class="d-none">{{ data.value }}</td>
+                </template>
+
+            </b-table>
+
+            <!-- BTN MODAL -->
+            <template #modal-footer>
+                <b-button @click="saveItems()" id="btn-modal">Save</b-button>
+            </template>
+        </b-modal>
+
+        <!-- CONTAINER  -->
         <b-container class="px-lg-5 ">
 
             <b-table v-show="showskeletonTable===false" small :per-page="perPage" :current-page="currentPage"
@@ -126,7 +195,7 @@
                             <p class="text-subtotal">$ {{ subtotalCart }}</p>
                         </div>
                         <div class="d-flex justify-content-between fw-bold fs-5 mt-3">
-                            <p class="text-shipping" >Shipping</p>
+                            <p class="text-shipping">Shipping</p>
                             <p class="text-shipping">$ {{ TotalshippingCart }}</p>
                         </div>
                         <hr>
@@ -134,7 +203,8 @@
                             <p>Total</p>
                             <p class="text-danger">$ {{ subtotalCart + TotalshippingCart }}</p>
                         </div>
-                        <b-button class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5"
+                        <b-button @click="goToCheckout()"
+                            class="d-flex align-items-center justify-content-center gap-2 px-5 py-3 w-100 mt-5"
                             id="btn-tocheckout">
                             <strong>PROCEED TO CHECKOUT</strong>
                             <b-icon icon="arrow-right" aria-hidden="true"></b-icon>
@@ -172,8 +242,10 @@
                 alertMessage: '',
 
                 showSpinner: false,
-                showskeletonTable: false
+                showskeletonTable: false,
 
+                // MODAL 
+                fieldsModalProductStatus: ['Product', 'Status', 'Price', 'Quantity', 'Total', 'Delete']
             }
         },
 
@@ -190,12 +262,20 @@
                 return this.items
             },
 
-            subtotalCart(){
-                return this.items.reduce((accu,item)=> accu + item.Total, 0 )
+            itemsErrorInGoToCheckout() {
+                if (!this.items) {
+                    return []
+                }
+                return this.items
+                .filter(item => item.Product.delete === true || item.Product.visibility === false || item.Product.stock === 0 || item.Product.stock < item.Quantity)
             },
 
-            TotalshippingCart(){
-                return this.items.reduce((accu,item)=> accu + item.Product.shipping,0 )
+            subtotalCart() {
+                return this.items.reduce((accu, item) => accu + item.Total, 0)
+            },
+
+            TotalshippingCart() {
+                return this.items.reduce((accu, item) => accu + item.Product.shipping, 0)
             },
 
             rows() {
@@ -235,9 +315,7 @@
 
             },
 
-
             async onQuantityChange(id, newQuantity) {
-
 
                 this.showskeletonTable = true
 
@@ -266,7 +344,6 @@
 
                 this.showskeletonTable = false
 
-
             },
 
             async getItems() {
@@ -274,6 +351,7 @@
                 const response = await this.$store.dispatch('cart/ac_getItems')
                 if (response && response.messageSuccess) {
                     this.showskeletonTable = false
+                    this.alertMessage=response.messageSuccess
                 } else if (response && response.messageError) {
                     this.alertMessage = response.messageError
                     this.alertType = 'danger'
@@ -286,14 +364,11 @@
             },
 
             async updateCart() {
-
-                const confirme = confirm('Are you sure you want to delete this item ?')
+                const confirme = confirm('Are you sure you want to update your cart?')
                 if (confirme) {
                     this.showskeletonTable = true
-                    const response =await this.$store.dispatch('cart/ac_deleteAllItems')
-                    console.log( 'this is msg ==>', response.messageSuccess )
-                    
-                    if (response && response.messageSuccess ) {
+                    const response = await this.$store.dispatch('cart/ac_deleteAllItems')
+                    if (response && response.messageSuccess) {
 
                         this.alertMessage = response.messageSuccess
                         this.alertType = 'success'
@@ -312,6 +387,31 @@
                     }
                     this.showskeletonTable = false
                 }
+            },
+
+            async goToCheckout() {
+                await this.getItems()
+                this.itemsErrorInGoToCheckout = this.itemsInTable
+                    .filter(item => item.Product.delete === true || item.Product.visibility === false || item
+                        .Product.stock === 0 || item.Product.stock < item.Quantity)
+                this.itemsErrorInGoToCheckout.length > 0 ? this.$bvModal.show('modalErroToCheckout') : this.$router.push(`/${this.$route.params.storeName}/ChecKout`)
+            },
+
+            async saveItems(){
+                await this.getItems()
+                this.itemsErrorInGoToCheckout = this.itemsInTable
+                    .filter(item => item.Product.delete === true || item.Product.visibility === false || item
+                        .Product.stock === 0 || item.Product.stock < item.Quantity)
+                this.itemsErrorInGoToCheckout.length > 0 ? this.$bvModal.show('modalErroToCheckout') : this.$bvModal.hide('modalErroToCheckout')
+            }
+
+        },
+
+        watch: {
+            itemsErrorInGoToCheckout(newVal){
+                if(newVal.length===0){
+                    this.$bvModal.hide('modalErroToCheckout')
+                }
             }
         },
 
@@ -323,21 +423,26 @@
 </script>
 
 <style lang="scss" scoped>
+    p {
+        margin-bottom: 0px;
+    }
+
     #img-product {
         width: 90px;
     }
 
     ::v-deep .table thead tr th div {
-        font-size: 22px;
-        font-weight: 800;
+        font-size: 20px;
+        font-weight: 600;
     }
 
     ::v-deep .table tbody tr td {
-        font-weight: 800;
-        line-height: 100px;
-
+        font-weight: 400;
+        vertical-align: middle;
 
     }
+
+    // BTN TABLE
 
     #btn-updatecart {
         background-color: var(--primary-color);
@@ -363,6 +468,7 @@
         color: var(--thirday-color);
     }
 
+    // BTN CHECKOUT
     #btn-tocheckout {
         background-color: var(--thirday-color);
         color: var(--primary-color);
@@ -379,13 +485,13 @@
         background-color: var(--secondary-color);
     }
 
-    .text-shipping{
-        color:var(--paragraph-color);
+    .text-shipping {
+        color: var(--paragraph-color);
         font-weight: lighter;
     }
 
-    .text-subtotal{
-        color:var(--thirday-color);
+    .text-subtotal {
+        color: var(--thirday-color);
     }
 
     #input-coupon:focus {
@@ -401,12 +507,6 @@
         background-color: #f8f9fa !important;
     }
 
-    .disabled-row {
-        pointer-events: none;
-        /* Désactiver les interactions */
-        opacity: 0.6;
-        /* Rendre la ligne moins visible */
-    }
 
     /* alert */
 
@@ -441,16 +541,11 @@
         background-color: rgba(255, 255, 255, 0.8);
         z-index: 9999;
     }
+
+    // MODAL
+    #btn-modal {
+        background-color: var(--thirday-color);
+        width: 20%;
+        padding-block: 6px;
+    }
 </style>
-
-
-<!-- 
-===============> stock is 10  
-=====> commander 11 
-=====> message : max is 10  
-=====> click to checkout  
-=====> verification stock product 
-=====> message for any product stock is diminuer
-=====> getcart
-=====> if any product is 
--->
