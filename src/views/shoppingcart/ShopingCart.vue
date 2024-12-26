@@ -1,9 +1,5 @@
 <template>
     <section id="shoping-cart">
-        <div class="mb-5">
-            <breadCrumb :titlebreadcrumb="'Shopping cart'" />
-        </div>
-
         <!-- alert -->
         <b-alert id="alert" class="position-absolute bottom-0 d-flex align-items-center gap-3" :show="dismissCountDown"
             dismissible :variant="alertType" @dismissed="dismissCountDown=0" @dismiss-count-down="dismissSecs">
@@ -80,8 +76,9 @@
         </b-modal>
 
         <!-- CONTAINER  -->
-        <b-container class="px-lg-5 ">
+        <b-container  class="px-lg-5 ">
 
+        <div v-if="itemsInTable.length > 0">
             <b-table v-show="showskeletonTable===false" small :per-page="perPage" :current-page="currentPage"
                 id="tableOrders" :items="itemsInTable" hover responsive>
                 <template #cell(Product)="data">
@@ -211,15 +208,21 @@
                         </b-button>
                     </div>
                 </b-col>
-
             </b-row>
+        </div>
 
+        <!-- Login msg -->
+        <LoginMsg  v-show="!userConnected" />
+        <!-- EmptyCart -->
+        <EmptyCart v-if=" userConnected===true && itemsInTable.length===0 " />
+            
         </b-container>
     </section>
 </template>
 
 <script>
-    import breadCrumb from "@/components/BreadCrumb.vue"
+    import EmptyCart from "@/views/EmptyCart.vue"
+    import LoginMsg from "@/views/LoginMsg.vue"
 
     import {
         mapState,
@@ -228,7 +231,8 @@
     export default {
         name: 'ShopingCart',
         components: {
-            breadCrumb
+            EmptyCart,
+            LoginMsg
         },
         data() {
             return {
@@ -282,6 +286,10 @@
                 return this.items.length
             },
 
+            userConnected(){
+                let token=localStorage.getItem('tokenCustomer')
+                return token? true : false
+            }
         },
 
         methods: {
@@ -416,7 +424,8 @@
         },
 
         mounted() {
-            this.getItems()
+            let token = localStorage.getItem('token')
+            token? this.getItems() : ''
         }
 
     }
