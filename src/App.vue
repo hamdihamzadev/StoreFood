@@ -65,14 +65,15 @@
     },
 
     mounted() {
+      document.title=this.$route.params.storeName
       this.hideHeaderFooter = this.$route.path !== '/Signup' && this.$route.path !== '/Login';
     },
-
     watch: {
       $route() {
         this.updateHideHeaderFooter();
       }
-    }
+    },
+
 
 
   }
