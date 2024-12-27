@@ -1,15 +1,7 @@
 <template>
     <section id="ChecKout">
-        <div class="mb-5">
-            <breadCrumb :titlebreadcrumb="'ChecKout'" />
-        </div>
-        <b-container class="px-lg-5">
 
-            <div class="d-flex align-items-center justify-content-center p-2 border-top border-success text-secondary bg-body-secondary mb-5">
-                <div><b-icon icon="tag" aria-hidden="true"> </b-icon> Have a coupon?</div>
-                <b-dropdown-item-button  v-b-modal.modal-1 class="text-decoration-underline p-0">Click here</b-dropdown-item-button> 
-                <span>to enter your code</span>
-            </div>
+        <b-container class="px-lg-5">
 
             <!-- Modal coupon -->
             <div>
@@ -29,67 +21,59 @@
             <b-row>
                 <!----------------------- form ----------------------->
                 <b-col lg="8" class="mb-5 mb-lg-0">
-                    <b-form>
+                    <b-form @submit.prevent="onSubmit">
                         <b-row class="gy-4">
-                            <b-col>
-                                <b-form-group id="input-group-2" label="Fist Name:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" placeholder="Fist Name" required>
+                            <b-col cols="12" md="6">
+                                <b-form-group id="input-group-2" label="First Name:" label-for="input-2">
+                                    <b-form-input v-model="form.firstName" :class="{'border-danger': error.firstName===false}" type="text" class="h-input mt-2" id="input-2" placeholder="First Name" required>
                                     </b-form-input>
+                                    <span v-show="error.firstName===false" class="text-danger">Please enter a valid text (no numbers allowed).</span>
                                 </b-form-group>
                             </b-col>
-                            <b-col>
+                            <b-col cols="12" md="6">
                                 <b-form-group id="input-group-2" label="Last Name:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" placeholder="Last Name" required>
+                                    <b-form-input v-model="form.lastName" :class="{'border-danger': error.lastName===false}" type="text" class="h-input mt-2" id="input-2" placeholder="Last Name" required>
                                     </b-form-input>
+                                    <span v-show="error.lastName===false" class="text-danger">Please enter a valid text (no numbers allowed).</span>
                                 </b-form-group>
                             </b-col>
-                            <b-col cols="12">
-                                <b-form-group id="input-group-2" label="Contry:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" placeholder="Contry" required>
+                            <b-col cols="12" md="6">
+                                <b-form-group id="input-group-2" label="Phone:" label-for="input-2">
+                                    <b-form-input v-model="form.phone" :class="{'border-danger': error.phone===false}" type="tel" class="h-input mt-2" id="input-2" placeholder="Phone" required>
                                     </b-form-input>
+                                    <span v-show="error.phone===false" class="text-danger">Please enter a valid phone number.</span>
                                 </b-form-group>
                             </b-col>
-                            <b-col cols="12">
-                                <b-form-group class="mb-3" id="input-group-2" label="Address:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" placeholder="Address" required>
-                                    </b-form-input>
-                                </b-form-group>
-                                <b-form-input class="h-input" id="input-2" placeholder="Address" required>
-                                </b-form-input>
-                            </b-col>
-                            <b-col cols="12">
+                            <b-col cols="12" md="6">
                                 <b-form-group id="input-group-2" label="Country:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
+                                    <b-form-input v-model="form.country" :class="{'border-danger': error.country===false}" type="text" class="h-input mt-2" id="input-2" placeholder="Country" required>
+                                    </b-form-input>
+                                    <span v-show="error.country===false" class="text-danger">Please enter a valid text (no numbers allowed).</span>
                                 </b-form-group>
                             </b-col>
                             <b-col cols="12">
                                 <b-form-group id="input-group-2" label="City:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
+                                    <b-form-input v-model="form.city" :class="{'border-danger': error.city===false}" type="text" class="h-input mt-2" id="input-2" placeholder="City" required>
+                                    </b-form-input>
+                                    <span v-show="error.city===false" class="text-danger">Please enter a valid text (no numbers allowed).</span>
                                 </b-form-group>
                             </b-col>
                             <b-col cols="12">
-                                <b-form-group id="input-group-2" label="Postcode / ZIP:" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
-                                </b-form-group>
-                            </b-col>
-                            <b-col lg="6">
-                                <b-form-group id="input-group-2" label="Phone" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
-                                </b-form-group>
-                            </b-col>
-                            <b-col lg="6">
-                                <b-form-group id="input-group-2" label="Email" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
+                                <b-form-group class="mb-3" id="input-group-2" label="Address:" label-for="input-2">
+                                    <b-form-input v-model="form.address" type="text" class="h-input mt-2" id="input-2" placeholder="Address" required>
+                                    </b-form-input>
                                 </b-form-group>
                             </b-col>
                             <b-col lg="12">
-                                <b-form-group id="input-group-2" label="Order notes" label-for="input-2">
-                                    <b-form-input class="h-input mt-2" id="input-2" required></b-form-input>
+                                <b-form-group id="input-group-2" label="Notes" label-for="input-2">
+                                    <b-form-textarea v-model="form.notes" id="input-2" class="h-input mt-2" placeholder="Enter something..."
+                                        rows="3" max-rows="6"></b-form-textarea>
                                 </b-form-group>
                             </b-col>
-
+                            <b-col>
+                                <b-button id="btn-placeOrder" class="fw-bold w-100 p-3" type="submit"><strong>PLACE ORDER</strong></b-button>
+                            </b-col>
                         </b-row>
-
                     </b-form>
                 </b-col>
 
@@ -128,7 +112,7 @@
                         <p class="mb-4">
                             <b-icon icon="wallet" aria-hidden="true"> </b-icon> Payment on delivery
                         </p>
-                        <b-button id="btn-placeOrder" class="fw-bold w-100 p-3"><strong>PLACE ORDER</strong></b-button>
+                       
 
 
                     </div>
@@ -139,23 +123,50 @@
 </template>
 
 <script>
-    import breadCrumb from '@/components/BreadCrumb.vue'
     export default {
         name: 'ChecKout',
-        components: {
-            breadCrumb
+        data() {
+            return {
+                form: {
+                    firstName: '',
+                    lastName: '',
+                    phone: '',
+                    country: '',
+                    city: '',
+                    address: '',
+                    notes: ''
+                },
+                error:{
+                    firstName: null,
+                    lastName: null,
+                    phone: null,
+                    country: null,
+                    city: null,
+                }
+            };
         },
-
         methods: {
+            handlevalidation() {
+                    const namePattern = /^[A-Za-z\s]+$/;
+                    this.error.firstName = namePattern.test(this.form.firstName);
+                    this.error.lastName = namePattern.test(this.form.lastName);
+                    this.error.phone = /^\d+$/.test(this.form.phone);
+                    this.error.country = namePattern.test(this.form.country);
+                    this.error.city = namePattern.test(this.form.city);
+
+            },
+            onSubmit() {
+              this.handlevalidation();
+              Object.values(this.error).some(err=>err===false)? console.log('error'): console.log('success');
+            },
             GetCoupon() {
-                this.$bvModal.hide('modal-1')
+                // Handle coupon logic
             }
         }
     }
 </script>
 
 <style scoped>
-
     /* modal start */
 
     .backg-green {
@@ -165,22 +176,22 @@
     ::v-deep .modal-header {
         justify-content: space-between;
 
-        & button{
+        & button {
             border: none;
         }
     }
 
-    ::v-deep button:not(:disabled){
+    ::v-deep button:not(:disabled) {
         border: none;
 
         border-radius: 5px;
-    padding: 2px 11px;
+        padding: 2px 11px;
     }
 
     /* modal end */
 
     .h-input {
-        height: 45px;
+        height: 48px;
 
         &:focus {
             box-shadow: none;
@@ -188,7 +199,7 @@
         }
 
         &::placeholder {
-            color: var(--para-color);
+            color: #bbbbbb;
         }
 
     }

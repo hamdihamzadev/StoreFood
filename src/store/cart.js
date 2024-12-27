@@ -54,7 +54,6 @@ const actions = {
                 }
             })
             const newCart = response.data.cart
-            console.log('cat is =========>', newCart)
             commit('m_createCart', newCart)
 
         } catch (error) {
