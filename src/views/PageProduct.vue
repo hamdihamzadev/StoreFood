@@ -298,7 +298,6 @@
                 }
             },
 
-
             async getProductsCategory() {
                 try {
                     const nameStore = this.$route.params.storeName
@@ -315,7 +314,6 @@
             showModalConnect() {
                 this.$bvModal.show('modal-connecte')
             },
-
 
             // ADD ITEM TO CART
             async addToCart() {
@@ -358,7 +356,6 @@
                 addItemToCartAction: 'ac_addItem'
             }),
 
-
         },
 
         watch: {
@@ -372,9 +369,6 @@
 
         async mounted() {
             await this.getProduct()
-           
-
-
         },
     }
 </script>
