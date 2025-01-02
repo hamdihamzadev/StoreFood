@@ -23,7 +23,8 @@ const mutations = {
                         delete: item.product.delete,
                         visibility: item.product.visibility,
                         deleteitem: item.delete,
-                        shipping:item.product.shipping
+                        shipping:item.product.shipping,
+                        id: item.product._id,
                     },
                     Price: item.product.promotion.priceAfter > 0 ?
                         item.product.promotion.priceAfter : item.product.price,

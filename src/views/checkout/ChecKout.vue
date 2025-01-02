@@ -106,14 +106,14 @@
                             <p class="fw-bold fs-5"><strong>Products</strong></p>
                             <p class="fw-bold fs-5">Total</p>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3" v-for="item in itemsInTable" :key="item.id">
                             <div class="d-flex justify-content-between mb-1">
-                                <p>Vegetable’s Package</p>
-                                <p><strong>$75.00</strong></p>
+                                <p><strong>{{ item.Product.name }}</strong></p>
+                                <p><strong>${{ item.Total }}</strong></p>
                             </div>
-                            <div class="d-flex justify-content-between mb-3">
+                            <div  v-if="item.Product.shipping!==0" class="d-flex justify-content-between mb-3">
                                 <small>Shipping</small>
-                                <small>$7.00</small>
+                                <small>${{ item.Product.shipping }}</small>
                             </div>
                         </div>
                         <b-skeleton width="100%" class="mb-3" v-if="showskeleton" ></b-skeleton>
@@ -123,7 +123,7 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <p class="fw-bold fs-5 ">Total</p>
-                            <p class="fw-bold text-succes fs-5"><strong>$225.89</strong></p>
+                            <p class="fw-bold text-succes fs-5"><strong>${{ total }}</strong></p>
                         </div>
                         <hr class="mb-4 d-block">
                         <p class="mb-4">
@@ -183,6 +183,13 @@ import { mapState } from 'vuex';
                 }
                 return this.items
             },
+
+            total(){
+                if(!this.items){
+                    return 0
+                }
+                return this.items.reduce((accu, item) => accu + item.Total + item.Product.shipping, 0)
+            }
         },
         methods: {
             handlevalidation() {
@@ -240,15 +247,15 @@ import { mapState } from 'vuex';
                     }
                 }
                 catch(err){
-                    console.log('errror is ===============>',err)
+                    console.log('error get user is :',err)
                 }
             }
 
         },
         mounted() {
-            // let token = localStorage.getItem('token')
+            let token = localStorage.getItem('token')
             this.getUserConnected()
-            // token? (this.getItems(),this.getUser()) : ''
+            token? (this.getItems(),this.getUser()) : ''
         }
     }
 </script>
