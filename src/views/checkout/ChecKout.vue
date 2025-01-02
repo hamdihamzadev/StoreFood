@@ -5,6 +5,7 @@
             {{ alertMessage }}
         </b-alert>
 
+
         <b-container class="px-lg-5">
 
             <!-- Modal coupon -->
@@ -166,7 +167,8 @@ import { mapState } from 'vuex';
                 alertMessage: '',
 
                 // Skeleton
-                showskeleton:false
+                showskeleton:false,
+                teste:{}
             };
         },
 
@@ -219,9 +221,9 @@ import { mapState } from 'vuex';
                 }
             },
 
-            async getUser(){
+            async getUserConnected(){
                 try{
-                    const token=localStorage.getItem('token')
+                    const token = localStorage.getItem('tokenCustomer')
                     const nameStore=this.$route.params.storeName
                     const response=await axios.get(`http://localhost:3000/api/customers/CustomerConnected/${nameStore}`,{
                         headers:{
@@ -229,7 +231,12 @@ import { mapState } from 'vuex';
                         }
                     })
                     if(response && response.status===200){
-                        console.log('this is user==========>',response.data.customer)
+                        this.form.firstName=response.data.customer.firstName
+                        this.form.lastName=response.data.customer.lastName
+                        this.form.phone=`0${response.data.customer.phone}`
+                        this.form.country=response.data.customer.contry
+                        this.form.city=response.data.customer.city
+                        this.form.address=response.data.customer.adress
                     }
                 }
                 catch(err){
@@ -239,8 +246,9 @@ import { mapState } from 'vuex';
 
         },
         mounted() {
-            let token = localStorage.getItem('token')
-            token? (this.getItems(),this.getUser()) : ''
+            // let token = localStorage.getItem('token')
+            this.getUserConnected()
+            // token? (this.getItems(),this.getUser()) : ''
         }
     }
 </script>

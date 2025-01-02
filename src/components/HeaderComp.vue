@@ -188,7 +188,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    
 import { mapState } from 'vuex';
 
     export default {
@@ -293,28 +293,6 @@ import { mapState } from 'vuex';
                 this.activeIndex = index
             },
 
-            async getUserConnected() {
-                try {
-                    const nameStore = this.$route.params.storeName
-                    // const token=localStorage.getItem('tokenCustomer')
-                    const response = axios.get(`http://localhost:3000/api/customers/CustomerConnected/${nameStore}`
-                        // ,
-                        // {
-                        //     headers:{
-                        //         Authorization: `Bearer ${JSON.parse(token)}`
-                        //     }
-                        // }
-
-                    )
-                    this.userConnected = response.data.customer
-
-                } catch (error) {
-                    console.log('error the get user connected is :', error)
-                }
-            },
-
-
-
             logout() {
                 localStorage.clear('tokenCustomer')
                 localStorage.clear('cartUser')
@@ -325,7 +303,6 @@ import { mapState } from 'vuex';
 
         mounted() {
             this.toggleActiveMounted()
-            this.getUserConnected()
             this.isTokenAvailable()
             this.$store.dispatch('cart/ac_getItems')
 
