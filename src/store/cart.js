@@ -208,7 +208,11 @@ const actions = {
                 messageErrorServe: 'A problem has occurred on the server. Please try again later.'
             }
         }
-    }
+    },
+
+    
+
+
 }
 
 export default {
