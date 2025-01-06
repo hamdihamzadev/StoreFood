@@ -13,6 +13,7 @@ import LoginView from '@/views/loginSign/LoginView.vue'
 import ListCategories from '../views/category/ListCategories.vue'
 import PageNotFound from '../views/PageNotFound.vue'
 import ProductCategoryNotFound from '../views/ProductCategorynotFound.vue'
+import ThankYouPage from '../views/ThankYouPage.vue'
 
 
 Vue.use(VueRouter)
@@ -82,6 +83,13 @@ const routes = [
     path: '/:storeName/Login',
     name: 'Login',
     component:LoginView,
+    
+  },
+
+  {
+    path: '/:storeName/thank-you/:idOrder',
+    name: 'ThankYouPage',
+    component:ThankYouPage,
     
   },
 

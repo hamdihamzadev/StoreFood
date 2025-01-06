@@ -211,6 +211,8 @@
                 </template>
             </b-modal>
 
+            <p>{{ currentQuantity }}</p>
+
         </b-container>
     </section>
 </template>
@@ -270,6 +272,7 @@
                 return this.items
             },
 
+
             total() {
                 if (!this.items) {
                     return 0
@@ -291,6 +294,7 @@
                 this.error.city = namePattern.test(this.form.city);
 
             },
+
             async placeOrder() {
                 await this.handlevalidation()
                 if (!Object.values(this.error).some(err => err === false)) {
@@ -300,11 +304,9 @@
                     if(this.itemsProductNoAvaible.length > 0){
                         this.$bvModal.show('modalProductsNoAvailble')
                     }
-                    
-                    Object.keys(this.error).forEach(key => this.error[key] === null)
-                    this.dismissCountDown = this.dismissSecs
-                    this.alertType = 'success'
-                    this.alertMessage = 'Your order has been placed successfully! 🎉'
+                    await this.changePusrched()
+                    await this.reduceQuantityProduct()
+                    this.$router.push(`/${this.$route.params.storeName}/ThankYouPage`)
                 }
             },
 
@@ -348,8 +350,41 @@
                 } catch (err) {
                     console.log('error get user is :', err)
                 }
-            }
+            },
 
+            async changePusrched(){
+                try{
+                    const cartId = localStorage.getItem('cartUser')
+                    const token = localStorage.getItem('tokenCustomer')
+                    const items=this.itemsInTable.map(item=>item.id)
+                    const nameStore=this.$route.params.storeName
+                    const response=axios.put(`http://localhost:3000/api/cart/changePurchased/${nameStore}/${cartId}`,{items},{
+                        headers:{
+                            Authorization:`Bearer ${token}`
+                        }
+                    })
+
+                    console.log(response.data.message)
+                }
+                catch(error){
+                    console.error(error)
+                }
+            },
+
+            async reduceQuantityProduct(){
+                try{
+                    const nameStore=this.$route.path.storeName
+                    const products=this.itemsInTable.map(item=>({
+                        quantity:item.Quantity[1]-item.Quantity[0],
+                        id:item.id
+                    }))
+                    const response=await axios.put(`http://localhost:3000/api/product/changeQuantity/${nameStore}`,{products})
+                    console.log(response.data.message)
+                }
+                catch(error){
+                    console.error(error)
+                }
+            }
         },
         async beforeMount() {
             await this.getUserConnected()
