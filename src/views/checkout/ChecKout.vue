@@ -211,7 +211,7 @@
                 </template>
             </b-modal>
 
-            <p>{{ currentQuantity }}</p>
+            <p>{{ curren }}</p>
 
         </b-container>
     </section>
@@ -272,6 +272,17 @@
                 return this.items
             },
 
+            curren(){
+                if (!this.items) {
+                    return []
+                }
+                return this.itemsInTable.map(item=>({
+                        quantity:item.Quantity[1]-item.Quantity[0],
+                        id:item.id,
+                        qfte:item.Quantity[1]
+                    }))
+            },
+
 
             total() {
                 if (!this.items) {
@@ -304,9 +315,9 @@
                     if(this.itemsProductNoAvaible.length > 0){
                         this.$bvModal.show('modalProductsNoAvailble')
                     }
-                    await this.changePusrched()
+                    // await this.changePusrched()
                     await this.reduceQuantityProduct()
-                    this.$router.push(`/${this.$route.params.storeName}/ThankYouPage`)
+                    // this.$router.push(`/${this.$route.params.storeName}/ThankYouPage`)
                 }
             },
 
@@ -373,13 +384,13 @@
 
             async reduceQuantityProduct(){
                 try{
-                    const nameStore=this.$route.path.storeName
+                    const nameStore=this.$route.params.storeName
                     const products=this.itemsInTable.map(item=>({
                         quantity:item.Quantity[1]-item.Quantity[0],
-                        id:item.id
+                        id:item.Product.id
                     }))
                     const response=await axios.put(`http://localhost:3000/api/product/changeQuantity/${nameStore}`,{products})
-                    console.log(response.data.message)
+                    console.log(response.status)
                 }
                 catch(error){
                     console.error(error)
